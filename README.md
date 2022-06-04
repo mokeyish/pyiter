@@ -1,5 +1,5 @@
 # PyIter
-![Python versions](https://img.shields.io/pypi/pyversions/pyiter?style=for-the-badge)
+
 [![Pypi version](https://img.shields.io/pypi/v/pyiter?style=for-the-badge)](https://pypi.org/project/pyiter/)
 
 PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、TypeSrcipt and Rust .

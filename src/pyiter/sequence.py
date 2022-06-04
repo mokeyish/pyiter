@@ -9,6 +9,12 @@ V = TypeVar("V")
 
 
 class Sequence(Generic[T], Iterable[T]):
+    """
+    Given an [iterator] function constructs a [Sequence] that returns values through the [Iterator]
+    provided by that function.
+    
+    The values are evaluated lazily, and the sequence is potentially infinite.
+    """
     _iter: Iterable[T]
 
     def __init__(self, v: Iterable[T]) -> None:
