@@ -19,7 +19,7 @@ pip install pyiter
 ## Quickstart
 
 ```python
-from pyiter import it
+from pyiter import iterate as it
 
 text = ["hello", "world"]
 iterate(text).map(str.upper).to_list()
@@ -27,10 +27,26 @@ iterate(text).map(str.upper).to_list()
 ```
 
 **Type inference**
-![.](./screenshot.png)
+![.](./screenshots/screenshot.png)
 
 ## API
 
 See [API](https://pyiter.yish.org/pyiter/sequence.html) docuumention.
 
+- You no need to read api documention. all api functions are listed by the code completion as follows.
+  
+   ![.](./screenshots/apilist.png)
 
+- All documentions are showed as follows.
+
+   ![.](./screenshots/apidoc.png)
+
+## Similar libraries
+
+Note that none of the following libraries are providing full strong typing for code completion.
+
+- [Pyterator](https://github.com/remykarem/pyterator)
+- [PyFunctional](https://github.com/EntilZha/PyFunctional)
+- [fluent](https://github.com/dwt/fluent)
+- [Simple Smart Pipe](https://github.com/sspipe/sspipe)
+- [pyxtension](https://github.com/asuiu/pyxtension)
