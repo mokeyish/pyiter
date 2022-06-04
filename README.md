@@ -31,4 +31,6 @@ iterate(text).map(str.upper).to_list()
 
 ## API
 
+See [API](https://pyiter.yish.org/pyiter/sequence.html) docuumention.
+
 
