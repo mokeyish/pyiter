@@ -12,7 +12,7 @@ package:
     python -m build
 
 # publish package to pypi
-publish: (package)
+publish: package
     python -m twine upload --repository pypi dist/*
 
 # build docs
