@@ -22,12 +22,12 @@ pip install pyiter
 from pyiter import iterate as it
 
 text = ["hello", "world"]
-iterate(text).map(str.upper).to_list()
+it(text).map(str.upper).to_list()
 # ['HELLO', 'WORLD']
 ```
 
 **Type inference**
-![.](./screenshots/screenshot.png)
+![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/screenshot.png)
 
 ## API
 
@@ -35,11 +35,11 @@ See [API](https://pyiter.yish.org/pyiter/sequence.html) docuumention.
 
 - You no need to read api documention. all api functions are listed by the code completion as follows.
   
-   ![.](./screenshots/apilist.png)
+   ![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/apilist.png)
 
 - All documentions are showed as follows.
 
-   ![.](./screenshots/apidoc.png)
+   ![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/apidoc.png)
 
 ## Similar libraries
 

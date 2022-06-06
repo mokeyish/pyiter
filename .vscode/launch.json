@@ -5,49 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: install dev requirements",
-            "type": "python",
-            "request": "launch",
-            "module": "pip",
-            "args": [
-                "install",
-                "-r",
-                "requirements/dev.txt"
-            ],
-            "justMyCode": true
-        },
-        {
-            "name": "Python: build",
-            "type": "python",
-            "request": "launch",
-            "module": "build",
-            "justMyCode": true
-        },
-        {
-            "name": "Python: publish",
-            "type": "python",
-            "request": "launch",
-            "module": "twine",
-            "args": [
-                "upload",
-                "--repository", "pypi",
-                "${workspaceRoot}/dist/*"
-            ],
-            "justMyCode": true
-        },
-        {
-            "name": "Python: build docs",
-            "type": "python",
-            "request": "launch",
-            "module": "pdoc",
-            "args": [
-                "${workspaceRoot}/src/pyiter",
-                "-t", "${workspaceRoot}/src/templates",
-                "-o", "${workspaceRoot}/docs"
-            ],
-            "justMyCode": true
-        },
-        {
             "name": "Python: debug current file",
             "type": "python",
             "request": "launch",
@@ -64,7 +21,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/src/pyiter/sequence.py",
             "args": [
-                "-v"
+                // "-v"
             ],
             "console": "integratedTerminal",
             "justMyCode": true
