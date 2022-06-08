@@ -1474,6 +1474,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> from tqdm import tqdm
         >>> from time import sleep
         >>> it(range(10)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
+        >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
         return ProgressSequence(self, progress_func)
 
@@ -1512,8 +1513,11 @@ class Sequence(Generic[T], Iterable[T]):
     
     @property
     def len(self) -> int:
-        if not isinstance(self._iter, Sequence) and hasattr(self._iter, '__len__'):
-            return len(self._iter)
+        if not isinstance(self._iter, Sequence):
+            if hasattr(self._iter, '__len__'):
+                return len(self._iter)
+            elif hasattr(self._iter, '__length_hint__'):
+                return self._iter.__length_hint__()
         if self._cache is None:
             for _ in self:
                 pass
@@ -1762,7 +1766,19 @@ class ProgressSequence(Sequence[T]):
     
     def __do_iter__(self) -> Iterator[T]:
         yield from self._progress_func(self._iter)
+    
+    def to_list(self) -> List[T]:
+        progress_func = self._progress_func
+        class ListLike(List[T]):
+            def __init__(self, iterable: Iterable[T]) -> None:
+                super().__init__(iterable)
+        
+            def __iter__(self) -> Iterator[T]:
+                yield from progress_func(it(super().__iter__()))
 
+        return ListLike(self._iter)
+
+    
 def throw(exception: Exception) -> None:
     raise exception
 
