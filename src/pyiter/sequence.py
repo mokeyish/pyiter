@@ -1466,7 +1466,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return separator.join(self)
     
-    def progress(self, progress_func: Callable[[Sequence[T]], Iterable[T]]) -> Sequence[T]:
+    def progress(self, progress_func: Callable[[Iterable[T]], Iterable[T]]) -> Sequence[T]:
         """
          Returns a Sequence that enable a progress bar for the given Sequence.
         
