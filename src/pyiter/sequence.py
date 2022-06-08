@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Dict, Generic, Iterable, Iterator, Union, List, Set, Optional, Tuple, Type, TypeVar, Callable, overload, Literal
 
+
 T = TypeVar("T")
 R = TypeVar("R")
 
@@ -16,10 +17,12 @@ class Sequence(Generic[T], Iterable[T]):
     The values are evaluated lazily, and the sequence is potentially infinite.
     """
     _iter: Iterable[T]
+    _cache: Optional[List[T]]
 
     def __init__(self, v: Iterable[T]) -> None:
         super().__init__()
         self._iter = v
+        self._cache = None
 
     def filter(self, predicate: Callable[[T], bool]) -> Sequence[T]:
         """
@@ -116,17 +119,22 @@ class Sequence(Generic[T], Iterable[T]):
         return self.map(transform).filter_not_none()
     
 
-    def paralell_map(self, transform: Callable[[T], R]) -> Sequence[R]:
+    def parallel_map(self, transform: Callable[[T], R], max_workers: Optional[int]=None) -> Sequence[R]:
         """
          Returns a Sequence containing the results of applying the given [transform] function
          to each element in the original Sequence.
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
-        >>> it(lst).paralell_map(lambda x: x['age'])
+        >>> it(lst).parallel_map(lambda x: x['age'])
+        [12, 13]
+
+         Example 2:
+        >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
+        >>> it(lst).parallel_map(lambda x: x['age'], max_workers=2)
         [12, 13]
         """
-        return ParallelMappingSequence(self, transform)
+        return ParallelMappingSequence(self, transform, max_workers)
 
     def find(self, predicate: Callable[[T], bool]) -> Optional[T]:
         """
@@ -1212,31 +1220,38 @@ class Sequence(Generic[T], Iterable[T]):
             destination[k].append(e)
         return destination
 
-    def foreach(self, action: Callable[[T], None]) -> None:
+    def for_each(self, action: Callable[[T], None]) -> None:
         """
          Invokes [action] function on each element of the given Sequence.
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).foreach(lambda x: print(x))
+        >>> it(lst).for_each(lambda x: print(x))
         a
         b
         c
         """
         self.on_each(action)
     
-    def parallel_foreach(self, action: Callable[[T], None]) -> None:
+    def parallel_for_each(self, action: Callable[[T], None], max_workers: Optional[int]=None) -> None:
         """
          Invokes [action] function on each element of the given Sequence in parallel.
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).parallel_foreach(lambda x: print(x))
+        >>> it(lst).parallel_for_each(lambda x: print(x))
+        a
+        b
+        c
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).parallel_for_each(lambda x: print(x), max_workers=2)
         a
         b
         c
         """
-        self.parallel_on_each(action)
+        self.parallel_on_each(action, max_workers)
     
     def foreach_indexed(self, action: Callable[[T, int], None]) -> None:
         """
@@ -1266,7 +1281,7 @@ class Sequence(Generic[T], Iterable[T]):
             action(i)
         return self
     
-    def parallel_on_each(self, action: Callable[[T], None]) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[[T], None], max_workers: Optional[int]=None) -> Sequence[T]:
         """
          Invokes [action] function on each element of the given Sequence.
 
@@ -1276,11 +1291,16 @@ class Sequence(Generic[T], Iterable[T]):
         a
         b
         c
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).parallel_on_each(lambda x: print(x), max_workers=2) and None
+        a
+        b
+        c
         """
-        from concurrent.futures import ThreadPoolExecutor
-        with ThreadPoolExecutor() as executor:
-            for i in self:
-                executor.submit(action, i)
+        for _ in ParallelMappingSequence(self, action, max_workers):
+            pass
         return self
     
     def on_each_indexed(self, action: Callable[[T, int], None]) -> Sequence[T]:
@@ -1445,6 +1465,17 @@ class Sequence(Generic[T], Iterable[T]):
         'a, b, c'
         """
         return separator.join(self)
+    
+    def progress(self, progress_func: Callable[[Sequence[T]], Iterable[T]]) -> Sequence[T]:
+        """
+         Returns a Sequence that enable a progress bar for the given Sequence.
+        
+         Example 1:
+        >>> from tqdm import tqdm
+        >>> from time import sleep
+        >>> it(range(10)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
+        """
+        return ProgressSequence(self, progress_func)
 
     def to_set(self) -> Set[T]:
         """
@@ -1479,22 +1510,41 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return list(self)
     
+    @property
+    def len(self) -> int:
+        if not isinstance(self._iter, Sequence) and hasattr(self._iter, '__len__'):
+            return len(self._iter)
+        if self._cache is None:
+            for _ in self:
+                pass
+        return len(self._cache)
+    
     def __len__(self) -> int:
-        return len(self._iter)
+        return self.len
 
     def __repr__(self) -> str:
         return str(self.to_list())
 
     def __iter__(self) -> Iterator[T]:
-        return iter(self._iter)
-
+        if self._cache:
+            yield from self._cache
+        else:
+            cache = []
+            for x in self.__do_iter__():
+                cache.append(x)
+                yield x
+            self._cache = cache
+    
+    def __do_iter__(self) -> Iterator[T] :
+        yield from self._iter
+    
 
 class FilteringSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._predicate = predicate
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         for i in self._iter:
             if self._predicate(i):
                 yield i
@@ -1502,28 +1552,38 @@ class FilteringSequence(Sequence[T]):
 
 class MappingSequence(Sequence[R]):
     def __init__(self, iterable: Iterable[T], transform: Callable[[T], R]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._transform = transform
     
-    def __iter__(self) -> Iterator[R]:
+    def __do_iter__(self) -> Iterator[R]:
         for i in self._iter:
             yield self._transform(i)
 
 
 class ParallelMappingSequence(Sequence[R]):
-    def __init__(self, iterable: Iterable[Sequence[T]], transformer: Callable[[T], R] , max_workers: Optional[int]=None) -> None:
-        self._iter = iterable
+    def __init__(self, iterable: Iterable[Sequence[T]], transformer: Callable[[T], R], max_workers: Optional[int]=None) -> None:
+        super().__init__(iterable)
         self._transformer = transformer
         self._max_workers = max_workers
     
-    def __iter__(self) -> Iterator[R]:
+    def __do_iter__(self) -> Iterator[R]:
         from concurrent.futures import ThreadPoolExecutor
-        from multiprocessing import cpu_count
+        import os
+
         size = len(self._iter)
-        max_workers = cpu_count() -1 if self._max_workers is None else self._max_workers
-        
-        with ThreadPoolExecutor(max_workers) as executor:
-            yield from executor.map(self._transformer, self._iter, chunksize=size//max_workers)
+        max_workers = self._max_workers or min(32, (os.cpu_count() or 1) + 4)
+
+        chunksize = size // max_workers
+
+        if chunksize < 2:
+            with ThreadPoolExecutor(max_workers=size if size < max_workers else max_workers, thread_name_prefix='PyIter worker') as executor:
+                yield from executor.map(self._transformer, self._iter)
+                    
+        else:
+            for batch in it(self._iter).chunked(chunksize):
+                with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='PyIter worker') as executor:
+                    yield from executor.map(self._transformer, batch)
+
 
 class IndexedValue(Generic[T]):
     def __init__(self, index: int, value: T) -> None:
@@ -1536,29 +1596,29 @@ class IndexedValue(Generic[T]):
 
 class IndexingSequence(Sequence[IndexedValue[T]]):
     def __init__(self, iterable: Iterable[T]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         for i, e in enumerate(self._iter):
             yield IndexedValue(i, e)
 
 
 class FlatteningSequence(Sequence[R]):
     def __init__(self, iterable: Iterable[Sequence[T]], transformer: Callable[[T], R]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._transformer = transformer
     
-    def __iter__(self) -> Iterator[R]:
+    def __do_iter__(self) -> Iterator[R]:
         for i in self._iter:
             yield from self._transformer(i)
 
 
 class DropSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._n = n
         
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         for i, e in enumerate(self._iter):
             if i < self._n:
                 continue
@@ -1567,10 +1627,10 @@ class DropSequence(Sequence[T]):
 
 class DropWhileSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._predicate = predicate
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         drop_state = True
         for e in self._iter:
             if drop_state and self._predicate(e):
@@ -1582,10 +1642,10 @@ class DropWhileSequence(Sequence[T]):
 
 class TakeSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._n = n
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         for i, e in enumerate(self._iter):
             if i >= self._n:
                 break
@@ -1594,10 +1654,10 @@ class TakeSequence(Sequence[T]):
 
 class TakeWhileSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._predicate = predicate
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         take_state = True
         for e in self._iter:
             if take_state and self._predicate(e):
@@ -1611,11 +1671,11 @@ class MergingSequence(Sequence[V]):
     iterable: Iterable[T], 
     other: Iterable[R],
     transformer: Callable[[T, R], V] = lambda a,b:(a,b)) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._other = other
         self._transformer = transformer
     
-    def __iter__(self) -> Iterator[V]:
+    def __do_iter__(self) -> Iterator[V]:
         iter1 = iter(self._iter)
         iter2 = iter(self._other)
         while True:
@@ -1627,7 +1687,7 @@ class MergingSequence(Sequence[V]):
 
 class GroupingSequence(Sequence[Tuple[K, List[T]]]):
     def __init__(self, iterable: Iterable[T], key_func: Callable[[T], K]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._key_func = key_func
     
     @property
@@ -1642,7 +1702,7 @@ class GroupingSequence(Sequence[Tuple[K, List[T]]]):
     def items(self) -> Sequence[Tuple[K, List[T]]]:
         return self
     
-    def __iter__(self) -> Iterator[Tuple[K, List[T]]]:
+    def __do_iter__(self) -> Iterator[Tuple[K, List[T]]]:
         from collections import defaultdict
         d = defaultdict(list)
         for e in self._iter:
@@ -1650,25 +1710,24 @@ class GroupingSequence(Sequence[Tuple[K, List[T]]]):
         yield from d.items()
 
 
-
 class CombinationSequence(Sequence[Tuple[T, ...]]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._n = n
     
-    def __iter__(self) -> Iterator[Tuple[T, ...]]:
+    def __do_iter__(self) -> Iterator[Tuple[T, ...]]:
         from itertools import combinations
         yield from combinations(self._iter, self._n)
 
 
 class WindowedSequence(Sequence[List[T]]):
     def __init__(self, iterable: Iterable[T], size: int, step: int, partialWindows :bool) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
         self._size = size
         self._step = step
         self._partialWindows = partialWindows
     
-    def __iter__(self) -> Iterator[List[T]]:
+    def __do_iter__(self) -> Iterator[List[T]]:
         from collections import deque
         window = deque(maxlen=self._size)
         for e in self._iter:
@@ -1685,20 +1744,31 @@ class WindowedSequence(Sequence[List[T]]):
 
 class ConcatSequence(Sequence[T]):
     def __init__(self, iterable: Iterable[Iterable[T]]) -> None:
-        self._iter = iterable
+        super().__init__(iterable)
     
-    def __iter__(self) -> Iterator[T]:
+    def __do_iter__(self) -> Iterator[T]:
         for i in self._iter:
             yield from i
 
 
+class ProgressSequence(Sequence[T]):
+    def __init__(self, iterable: Sequence[T], progress_func: Callable[[Iterable[T]], Iterable[T]]) -> None:
+        super().__init__(iterable)
+        self._progress_func = progress_func
+    
+    @property
+    def len(self) -> int:
+        return len(self._iter)
+    
+    def __do_iter__(self) -> Iterator[T]:
+        yield from self._progress_func(self._iter)
 
 def throw(exception: Exception) -> None:
     raise exception
 
 
 @overload
-def sequence(*elements: T) -> Sequence[T]:
+def sequence(elements: List[T]) -> Sequence[T]:
     """
      Creates an iterator from a list of elements or given Iterable.
     
@@ -1717,6 +1787,9 @@ def sequence(*elements: T) -> Sequence[T]:
     ...
 @overload
 def sequence(elements: Iterable[T]) -> Sequence[T]:
+    ...
+@overload
+def sequence(*elements: T) -> Sequence[T]:
     ...
 def sequence(*iterable: Iterable[T]) -> Sequence[T]:
     """
