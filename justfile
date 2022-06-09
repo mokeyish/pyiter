@@ -21,4 +21,4 @@ docs:
 
 # install dev requirements
 dev:
-    python -m pip install -r requirements/dev.txt
+    python -m pip install -r requirements-dev.txt

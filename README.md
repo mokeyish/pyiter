@@ -28,6 +28,7 @@ it(text).map(str.upper).to_list()
 
 # use tqdm
 it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()
+
 ```
 
 
@@ -36,7 +37,7 @@ it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).par
 
 ## API
 
-See [API](https://pyiter.yish.org/pyiter/sequence.html) docuumention.
+See [API](https://pyiter.yish.org/pyiter/sequence.html) documention.
 
 - You no need to read api documention. all api functions are listed by the code completion as follows.
   

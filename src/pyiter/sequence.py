@@ -1,6 +1,11 @@
 from __future__ import annotations
-from typing import Dict, Generic, Iterable, Iterator, Union, List, Set, Optional, Tuple, Type, TypeVar, Callable, overload, Literal
-
+from typing import (
+    overload, List, Set, Dict, Generic, Iterable, Iterator, Union, 
+     Optional, Tuple, Type, TypeVar, Callable, Literal, 
+     TYPE_CHECKING
+)
+if TYPE_CHECKING:
+    from random import Random
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -22,7 +27,7 @@ class Sequence(Generic[T], Iterable[T]):
     def __init__(self, v: Iterable[T]) -> None:
         super().__init__()
         self._iter = v
-        self._cache = None
+        self._cache = v if type(self) == Sequence and type(v) == list else None
 
     def filter(self, predicate: Callable[[T], bool]) -> Sequence[T]:
         """
@@ -30,7 +35,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ 'a1', 'b1', 'b2', 'a2']
-        >>> it(lst).filter(lambda x: x.startswith('a'))
+        >>> it(lst).filter(lambda x: x.startswith('a')).to_list()
         ['a1', 'a2']
         """
         return FilteringSequence(self, predicate)
@@ -41,7 +46,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ 'a1', 'b1', 'b2', 'a2']
-        >>> it(lst).filter_indexed(lambda x, i: i == 2)
+        >>> it(lst).filter_indexed(lambda x, i: i == 2).to_list()
         ['b2']
         """
         return IndexingSequence(self).filter(lambda x: predicate(x.value, x.index)).map(lambda x: x.value)
@@ -52,7 +57,7 @@ class Sequence(Generic[T], Iterable[T]):
 
         Example 1:
         >>> lst = [ 'a1', 1, 'b2', 3]
-        >>> it(lst).filter_is_instance(int)
+        >>> it(lst).filter_is_instance(int).to_list()
         [1, 3]
 
         """
@@ -64,7 +69,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ 'a1', 'b1', 'b2', 'a2']
-        >>> it(lst).filter_not(lambda x: x.startswith('a'))
+        >>> it(lst).filter_not(lambda x: x.startswith('a')).to_list()
         ['b1', 'b2']
         """
         return self.filter(lambda x: not predicate(x))
@@ -75,7 +80,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ 'a', None, 'b']
-        >>> it(lst).filter_not_none()
+        >>> it(lst).filter_not_none().to_list()
         ['a', 'b']
         """
         return self.filter(lambda x: x is not None)
@@ -87,7 +92,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
-        >>> it(lst).map(lambda x: x['age'])
+        >>> it(lst).map(lambda x: x['age']).to_list()
         [12, 13]
         """
         return MappingSequence(self, transform)
@@ -100,7 +105,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
-        >>> it(lst).map_indexed(lambda x, i: x['age'] + i)
+        >>> it(lst).map_indexed(lambda x, i: x['age'] + i).to_list()
         [12, 14]
         """
         return IndexingSequence(self).map(lambda x: transform(x.value, x.index))
@@ -113,28 +118,28 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': None}]
-        >>> it(lst).map_not_none(lambda x: x['age'])
+        >>> it(lst).map_not_none(lambda x: x['age']).to_list()
         [12]
         """
         return self.map(transform).filter_not_none()
     
 
-    def parallel_map(self, transform: Callable[[T], R], max_workers: Optional[int]=None) -> Sequence[R]:
+    def parallel_map(self, transform: Callable[[T], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread') -> Sequence[R]:
         """
          Returns a Sequence containing the results of applying the given [transform] function
          to each element in the original Sequence.
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
-        >>> it(lst).parallel_map(lambda x: x['age'])
+        >>> it(lst).parallel_map(lambda x: x['age']).to_list()
         [12, 13]
 
          Example 2:
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
-        >>> it(lst).parallel_map(lambda x: x['age'], max_workers=2)
+        >>> it(lst).parallel_map(lambda x: x['age'], max_workers=2).to_list()
         [12, 13]
         """
-        return ParallelMappingSequence(self, transform, max_workers)
+        return ParallelMappingSequence(self, transform, max_workers, chunksize, executor)
 
     def find(self, predicate: Callable[[T], bool]) -> Optional[T]:
         """
@@ -369,6 +374,86 @@ class Sequence(Generic[T], Iterable[T]):
         for i in self if predicate is None else self.filter(predicate):
             last = i
         return last
+    
+    def index_of(self, element: T) -> int:
+        """
+         Returns first index of [element], or -1 if the collection does not contain element.
+         
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of('b')
+        1
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of('d')
+        -1
+        """
+        for i, x in enumerate(self._iter):
+            if x == element:
+                return i
+        return -1
+    
+    def last_index_of(self, element: T) -> int:
+        """
+         Returns last index of [element], or -1 if the collection does not contain element.
+         
+         Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).last_index_of('b')
+        3
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).last_index_of('d')
+        -1
+        """
+        seq = self.reversed()
+        last_idx = len(seq) - 1;
+        for i, x in enumerate(seq):
+            if x == element:
+                return last_idx - i
+        return -1
+    
+    def index_of_first(self, predicate: Callable[[T], bool]) -> int:
+        """
+         Returns first index of element matching the given [predicate], or -1 if no such element was found.
+         
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first(lambda x: x == 'b')
+        1
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first(lambda x: x == 'd')
+        -1
+        """
+        for i, x in enumerate(self._iter):
+            if predicate(x):
+                return i
+        return -1
+    
+    def index_of_last(self, predicate: Callable[[T], bool]) -> int:
+        """
+         Returns last index of element matching the given [predicate], or -1 if no such element was found.
+         
+         Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).index_of_last(lambda x: x == 'b')
+        3
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last(lambda x: x == 'd')
+        -1
+        """
+        seq = self.reversed()
+        last_idx = len(seq) - 1;
+        for i, x in enumerate(seq):
+            if predicate(x):
+                return last_idx - i
+        return -1
 
     @overload
     def single(self) -> T:
@@ -460,18 +545,18 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).drop(0)
+        >>> it(lst).drop(0).to_list()
         ['a', 'b', 'c']
 
          Example 2:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).drop(1)
+        >>> it(lst).drop(1).to_list()
         ['b', 'c']
 
 
          Example 2:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).drop(4)
+        >>> it(lst).drop(4).to_list()
         []
         """
         if n < 0:
@@ -488,7 +573,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 4, 1]
-        >>> it(lst).drop_while(lambda x: x < 3 )
+        >>> it(lst).drop_while(lambda x: x < 3 ).to_list()
         [3, 4, 1]
         """
         return DropWhileSequence(self, predicate)
@@ -499,18 +584,18 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).skip(0)
+        >>> it(lst).skip(0).to_list()
         ['a', 'b', 'c']
 
          Example 2:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).skip(1)
+        >>> it(lst).skip(1).to_list()
         ['b', 'c']
 
 
          Example 2:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).skip(4)
+        >>> it(lst).skip(4).to_list()
         []
         """
         return self.drop(n)
@@ -521,7 +606,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 4, 1]
-        >>> it(lst).skip_while(lambda x: x < 3 )
+        >>> it(lst).skip_while(lambda x: x < 3 ).to_list()
         [3, 4, 1]
         """
         return self.drop_while(predicate)
@@ -533,13 +618,13 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> a = ['a', 'b', 'c']
-        >>> it(a).take(0)
+        >>> it(a).take(0).to_list()
         []
 
 
          Example 2:
         >>> a = ['a', 'b', 'c']
-        >>> it(a).take(2)
+        >>> it(a).take(2).to_list()
         ['a', 'b']
 
         """
@@ -556,7 +641,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['a', 'b', 'c', 'd']
-        >>> it(lst).take_while(lambda x: x in ['a', 'b'])
+        >>> it(lst).take_while(lambda x: x in ['a', 'b']).to_list()
         ['a', 'b']
 
         """
@@ -568,13 +653,13 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> a = ['a', 'b', 'c']
-        >>> it(a).take_last(0)
+        >>> it(a).take_last(0).to_list()
         []
 
 
          Example 2:
         >>> a = ['a', 'b', 'c']
-        >>> it(a).take_last(2)
+        >>> it(a).take_last(2).to_list()
         ['b', 'c']
 
         """
@@ -592,12 +677,12 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['b', 'a', 'e', 'c']
-        >>> it(lst).sorted()
+        >>> it(lst).sorted().to_list()
         ['a', 'b', 'c', 'e']
 
          Example 2:
         >>> lst = [2, 1, 4, 3]
-        >>> it(lst).sorted()
+        >>> it(lst).sorted().to_list()
         [1, 2, 3, 4]
         """
         lst = list(self)
@@ -612,9 +697,9 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ {'name': 'A', 'age': 12 }, {'name': 'C', 'age': 10 }, {'name': 'B', 'age': 11 } ]
-        >>> it(lst).sorted_by(lambda x: x['name'])
+        >>> it(lst).sorted_by(lambda x: x['name']).to_list()
         [{'name': 'A', 'age': 12}, {'name': 'B', 'age': 11}, {'name': 'C', 'age': 10}]
-        >>> it(lst).sorted_by(lambda x: x['age'])
+        >>> it(lst).sorted_by(lambda x: x['age']).to_list()
         [{'name': 'C', 'age': 10}, {'name': 'B', 'age': 11}, {'name': 'A', 'age': 12}]
 
         """
@@ -628,7 +713,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['b', 'c', 'a']
-        >>> it(lst).sorted_descending()
+        >>> it(lst).sorted_descending().to_list()
         ['c', 'b', 'a']
         """
         return self.sorted().reversed()
@@ -640,9 +725,9 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [ {'name': 'A', 'age': 12 }, {'name': 'C', 'age': 10 }, {'name': 'B', 'age': 11 } ]
-        >>> it(lst).sorted_by_descending(lambda x: x['name'])
+        >>> it(lst).sorted_by_descending(lambda x: x['name']).to_list()
         [{'name': 'C', 'age': 10}, {'name': 'B', 'age': 11}, {'name': 'A', 'age': 12}]
-        >>> it(lst).sorted_by_descending(lambda x: x['age'])
+        >>> it(lst).sorted_by_descending(lambda x: x['age']).to_list()
         [{'name': 'A', 'age': 12}, {'name': 'B', 'age': 11}, {'name': 'C', 'age': 10}]
         """
         return self.sorted_by(key_selector).reversed()
@@ -654,7 +739,7 @@ class Sequence(Generic[T], Iterable[T]):
 
         Example 1:
         >>> lst = ['aa', 'bbb', 'c']
-        >>> it(lst).sorted_with(lambda a, b: len(a)-len(b))
+        >>> it(lst).sorted_with(lambda a, b: len(a)-len(b)).to_list()
         ['c', 'aa', 'bbb']
         """
         from functools import cmp_to_key
@@ -922,11 +1007,16 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 1, 2, 3]
-        >>> it(lst).distinct()
+        >>> it(lst).distinct().to_list()
         [1, 2, 3]
 
+         Example 2:
+        >>> lst = [(1, 'A'), (1, 'A'), (1, 'A'), (2, 'A'), (3, 'C'), (3, 'D')]
+        >>> it(lst).distinct().sorted().to_list()
+        [(1, 'A'), (2, 'A'), (3, 'C'), (3, 'D')]
+
         """
-        return Sequence(set(self))
+        return DistinctSequence(self)
     
     def distinct_by(self, key_selector: Callable[[T], K]) -> Sequence[T]:
         """
@@ -934,13 +1024,13 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 1, 2, 3]
-        >>> it(lst).distinct_by(lambda x: x%2)
-        [3, 2]
+        >>> it(lst).distinct_by(lambda x: x%2).to_list()
+        [1, 2]
 
         """
-        return Sequence(self.associate_by(key_selector).values())
+        return DistinctSequence(self, key_selector)
     
-    def reduce(self, accumulator: Callable[[T, T], T], initial: Optional[T] = None) -> T:
+    def reduce(self, accumulator: Callable[[R, T], R], initial: Optional[R] = None) -> T:
         """
          Returns the result of applying the specified [accumulator] function to the given Sequence's elements.
 
@@ -958,7 +1048,7 @@ class Sequence(Generic[T], Iterable[T]):
             result = accumulator(result, e)
         return result
     
-    def fold(self, initial: R, accumulator: Callable[[R, T], T]) -> R:
+    def fold(self, initial: R, accumulator: Callable[[R, T], R]) -> R:
         """
          Returns the result of applying the specified [accumulator] function to the given Sequence's elements.
 
@@ -1170,7 +1260,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['b', 'c', 'a']
-        >>> it(lst).reversed()
+        >>> it(lst).reversed().to_list()
         ['a', 'c', 'b']
         """
         lst = list(self)
@@ -1184,10 +1274,41 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [['a', 'b'], ['c'], ['d', 'e']]
-        >>> it(lst).flat_map(lambda x: x)
+        >>> it(lst).flat_map(lambda x: x).to_list()
         ['a', 'b', 'c', 'd', 'e']
         """
         return FlatteningSequence(self, transform)
+    
+    @overload
+    def flatten(self: Sequence[List[R]]) -> Sequence[R]:
+        """
+         Returns a sequence of all elements from all sequences in this sequence.
+
+         Example 1:
+        >>> lst = [['a', 'b'], ['c'], ['d', 'e']]
+        >>> it(lst).flatten().to_list()
+        ['a', 'b', 'c', 'd', 'e']
+        """
+        ...
+    @overload
+    def flatten(self: Sequence[Set[R]]) -> Sequence[R]:
+        ...
+    @overload
+    def flatten(self: Sequence[Tuple[R, ...]]) -> Sequence[R]:
+        ...
+    @overload
+    def flatten(self: Sequence[Sequence[R]]) -> Sequence[R]:
+        ...
+    def flatten(self: Sequence[Iterable[R]]) -> Sequence[R]:
+        """
+         Returns a sequence of all elements from all sequences in this sequence.
+
+         Example 1:
+        >>> lst = [['a', 'b'], ['c'], ['d', 'e']]
+        >>> it(lst).flatten().to_list()
+        ['a', 'b', 'c', 'd', 'e']
+        """
+        return FlatteningSequence(self)
     
 
     def group_by(self, key_selector: Callable[[T], K]) -> GroupingSequence[K, T]:
@@ -1197,7 +1318,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 4, 5]
-        >>> it(lst).group_by(lambda x: x%2)
+        >>> it(lst).group_by(lambda x: x%2).map(lambda x: (x[0], x[1].to_list())).to_list()
         [(1, [1, 3, 5]), (0, [2, 4])]
         """
         return GroupingSequence(self, key_selector)
@@ -1281,7 +1402,7 @@ class Sequence(Generic[T], Iterable[T]):
             action(i)
         return self
     
-    def parallel_on_each(self, action: Callable[[T], None], max_workers: Optional[int]=None) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[[T], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread' ) -> Sequence[T]:
         """
          Invokes [action] function on each element of the given Sequence.
 
@@ -1299,7 +1420,7 @@ class Sequence(Generic[T], Iterable[T]):
         b
         c
         """
-        for _ in ParallelMappingSequence(self, action, max_workers):
+        for _ in ParallelMappingSequence(self, action, max_workers, chunksize, executor):
             pass
         return self
     
@@ -1326,13 +1447,13 @@ class Sequence(Generic[T], Iterable[T]):
          Example 1:
         >>> lst1 = ['a', 'b', 'c']
         >>> lst2 = [1, 2, 3]
-        >>> it(lst1).zip(lst2)
+        >>> it(lst1).zip(lst2).to_list()
         [('a', 1), ('b', 2), ('c', 3)]
 
          Example 2:
         >>> lst1 = ['a', 'b', 'c']
         >>> lst2 = [1, 2, 3]
-        >>> it(lst1).zip(lst2, lambda x, y: x + '__' +str( y))
+        >>> it(lst1).zip(lst2, lambda x, y: x + '__' +str( y)).to_list()
         ['a__1', 'b__2', 'c__3']
         """
         ...
@@ -1342,7 +1463,108 @@ class Sequence(Generic[T], Iterable[T]):
     def zip(self, other: Iterable[R], transform: Callable[[T, R], V] = lambda a, b:(a, b)) -> Sequence[V]:
         return MergingSequence(self, other, transform)
     
-    def partition(self, predicate: Callable[[T], bool]) -> Tuple[Sequence[T], Sequence[T]]:
+    @overload
+    def zip_with_next(self) -> Sequence[Tuple[T, T]]:
+        """
+         Returns a sequence containing the results of applying the given [transform] function
+        to an each pair of two adjacent elements in this sequence.
+        
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).zip_with_next(lambda x, y: x + '__' + y).to_list()
+        ['a__b', 'b__c']
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).zip_with_next().to_list()
+        [('a', 'b'), ('b', 'c')]
+        """
+        ...
+    @overload
+    def zip_with_next(self, transform: Callable[[T, T], V]) -> Sequence[V]:
+        ...
+    def zip_with_next(self, transform: Optional[Callable[[T, T], V]]=None) -> Tuple[Sequence[V], Sequence[Tuple[T, T]]]:
+        """
+         Returns a sequence containing the results of applying the given [transform] function
+        to an each pair of two adjacent elements in this sequence.
+        
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).zip_with_next(lambda x, y: x + '__' + y).to_list()
+        ['a__b', 'b__c']
+
+         Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).zip_with_next().to_list()
+        [('a', 'b'), ('b', 'c')]
+        """
+        return MergingWithNextSequence(self, transform or (lambda a, b: (a, b)))
+    
+    def with_index(self):
+        """
+         Returns a sequence containing the elements of this sequence and their indexes.
+        
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).with_index().to_list()
+        [IndexedValue(0, a), IndexedValue(1, b), IndexedValue(2, c)]
+        """
+        return IndexingSequence(self)
+    
+
+    @overload
+    def shuffled(self) -> Sequence[T]:
+        """
+         Returns a sequence that yields elements of this sequence randomly shuffled
+        using the specified [random] instance as the source of randomness.
+
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled('123').to_list()
+        ['b', 'a', 'c']
+
+         Example 2:
+        >>> from random import Random
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled(Random('123')).to_list()
+        ['b', 'a', 'c']
+
+         Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled(123).to_list()
+        ['c', 'b', 'a']
+        """
+        ...
+    @overload
+    def shuffled(self, random: Random) -> Sequence[T]:
+        ...
+    @overload
+    def shuffled(self, seed: Union[int, str]) -> Sequence[T]:
+        ...
+    def shuffled(self, random: Optional[Union[Random, str, int]]=None) -> Sequence[T]:
+        """
+         Returns a sequence that yields elements of this sequence randomly shuffled
+        using the specified [random] instance as the source of randomness.
+
+         Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled('123').to_list()
+        ['b', 'a', 'c']
+
+         Example 2:
+        >>> from random import Random
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled(Random('123')).to_list()
+        ['b', 'a', 'c']
+
+         Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).shuffled(123).to_list()
+        ['c', 'b', 'a']
+        """
+        return ShufflingSequence(self, random)
+    
+    def partition(self, predicate: Callable[[T], bool], as_sequence: bool=False) -> Tuple[Sequence[T], Sequence[T]]:
         """
          Partitions the elements of the given Sequence into two groups,
          the first group containing the elements for which the predicate returns true,
@@ -1353,7 +1575,12 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).partition(lambda x: x.isalpha())
         (['a', 'b', 'c'], ['2'])
         """
-        return self.filter(predicate), self.filter(lambda x: not predicate(x))
+        part_a = self.filter(predicate)
+        part_b = self.filter(lambda x: not predicate(x))
+        if not as_sequence:
+            part_a = part_a.to_list()
+            part_b = part_b.to_list()
+        return part_a, part_b 
     
 
     @overload
@@ -1363,7 +1590,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).combinations(2)
+        >>> it(lst).combinations(2).to_list()
         [('a', 'b'), ('a', 'c'), ('b', 'c')]
         """
         ...
@@ -1383,7 +1610,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).combinations(2)
+        >>> it(lst).combinations(2).to_list()
         [('a', 'b'), ('a', 'c'), ('b', 'c')]
         """
         return CombinationSequence(self, n)
@@ -1401,35 +1628,35 @@ class Sequence(Generic[T], Iterable[T]):
         return self.skip(n).first( )
     
 
-    def windowed(self, size: int, step: int = 1, partialWindows: bool = False) -> Sequence[Sequence[T]]:
+    def windowed(self, size: int, step: int = 1, partialWindows: bool = False) -> Sequence[List[T]]:
         """
          Returns a Sequence of all possible sliding windows of size [size] from the given Sequence.
 
          Example 1:
         >>> lst = ['a', 'b', 'c', 'd', 'e']
-        >>> it(lst).windowed(3)
+        >>> it(lst).windowed(3).to_list()
         [['a', 'b', 'c'], ['b', 'c', 'd'], ['c', 'd', 'e']]
 
          Example 2:
         >>> lst = ['a', 'b', 'c', 'd', 'e']
-        >>> it(lst).windowed(3, 2)
+        >>> it(lst).windowed(3, 2).to_list()
         [['a', 'b', 'c'], ['c', 'd', 'e']]
 
          Example 3:
         >>> lst = ['a', 'b', 'c', 'd', 'e', 'f']
-        >>> it(lst).windowed(3, 2, True)
+        >>> it(lst).windowed(3, 2, True).to_list()
         [['a', 'b', 'c'], ['c', 'd', 'e'], ['e', 'f']]
         """
         return WindowedSequence(self, size, step, partialWindows)
     
 
-    def chunked(self, size: int) -> Sequence[Sequence[T]]:
+    def chunked(self, size: int) -> Sequence[List[T]]:
         """
          Returns a Sequence of all possible chunks of size [size] from the given Sequence.
 
          Example 1:
         >>> lst = ['a', 'b', 'c', 'd', 'e']
-        >>> it(lst).chunked(3)
+        >>> it(lst).chunked(3).to_list()
         [['a', 'b', 'c'], ['d', 'e']]
         """
         return self.windowed(size, size, True)
@@ -1442,14 +1669,14 @@ class Sequence(Generic[T], Iterable[T]):
          Example 1:
         >>> lst1 = ['a', 'b', 'c']
         >>> lst2 = [1, 2, 3]
-        >>> it(lst1).concat(lst2)
+        >>> it(lst1).concat(lst2).to_list()
         ['a', 'b', 'c', 1, 2, 3]
 
          Example 2:
         >>> lst1 = ['a', 'b', 'c']
         >>> lst2 = [1, 2, 3]
         >>> lst3 = [4, 5, 6]
-        >>> it(lst1).concat(lst2, lst3)
+        >>> it(lst1).concat(lst2, lst3).to_list()
         ['a', 'b', 'c', 1, 2, 3, 4, 5, 6]
         """
         return ConcatSequence([self, *other])
@@ -1473,7 +1700,7 @@ class Sequence(Generic[T], Iterable[T]):
          Example 1:
         >>> from tqdm import tqdm
         >>> from time import sleep
-        >>> it(range(10)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
+        >>> it(range(10)).progress(lambda x: tqdm(x, total=len(x))).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
         >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
         return ProgressSequence(self, progress_func)
@@ -1511,8 +1738,28 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return list(self)
     
-    @property
-    def len(self) -> int:
+    def let(self, block: Callable[[Sequence[T]], R]) -> R:
+        """
+         Calls the specified function [block] with `self` value as its argument and returns its result.
+            
+         Example 1:
+        >>> it(['a', 'b', 'c']).let(lambda x: x.map(lambda y: y + '!')).to_list()
+        ['a!', 'b!', 'c!']
+        """
+        return block(self)
+    
+    def also(self, block: Callable[[Sequence[T]], R]) -> R:
+        """
+         Calls the specified function [block] with `self` value as its argument and returns `self` value.
+            
+         Example 1:
+        >>> it(['a', 'b', 'c']).also(lambda x: x.map(lambda y: y + '!')).to_list()
+        ['a', 'b', 'c']
+        """
+        block(self)
+        return self
+    
+    def __len__(self) -> int:
         if not isinstance(self._iter, Sequence):
             if hasattr(self._iter, '__len__'):
                 return len(self._iter)
@@ -1522,12 +1769,11 @@ class Sequence(Generic[T], Iterable[T]):
             for _ in self:
                 pass
         return len(self._cache)
-    
-    def __len__(self) -> int:
-        return self.len
 
     def __repr__(self) -> str:
-        return str(self.to_list())
+        if self._cache:
+            return str(self._cache)
+        return 'Sequence(...)'
 
     def __iter__(self) -> Iterator[T]:
         if self._cache:
@@ -1565,28 +1811,50 @@ class MappingSequence(Sequence[R]):
 
 
 class ParallelMappingSequence(Sequence[R]):
-    def __init__(self, iterable: Iterable[Sequence[T]], transformer: Callable[[T], R], max_workers: Optional[int]=None) -> None:
+    Executor = Literal['Thread', 'Process']
+
+    def __init__(
+            self, 
+            iterable: Iterable[Sequence[T]], 
+            transformer: Callable[[T], R], 
+            max_workers: Optional[int]=None, 
+            chunksize: int=1,
+            executor: ParallelMappingSequence.Executor = 'Thread') -> None:
+
         super().__init__(iterable)
         self._transformer = transformer
         self._max_workers = max_workers
+        self._executor = executor
+        self._chunksize = chunksize
     
     def __do_iter__(self) -> Iterator[R]:
-        from concurrent.futures import ThreadPoolExecutor
         import os
 
+        def create_executor(max_workers: int, ):
+            if self._executor == 'Process':
+                from concurrent.futures import ProcessPoolExecutor
+                return ProcessPoolExecutor(max_workers=max_workers)
+            else:
+                from concurrent.futures import ThreadPoolExecutor
+                return ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='PyIter worker')
+
         size = len(self._iter)
+        chunksize = self._chunksize
         max_workers = self._max_workers or min(32, (os.cpu_count() or 1) + 4)
+        batch_count = -1 * (-size // chunksize)
+        max_workers = min(max_workers, batch_count)
 
-        chunksize = size // max_workers
+        batch_size = max_workers * chunksize
 
-        if chunksize < 2:
-            with ThreadPoolExecutor(max_workers=size if size < max_workers else max_workers, thread_name_prefix='PyIter worker') as executor:
-                yield from executor.map(self._transformer, self._iter)
-                    
+        if batch_size < size:
+            for batch in it(self._iter).chunked(batch_size):
+                with create_executor(max_workers) as executor:
+                    yield from executor.map(self._transformer, batch, chunksize=chunksize)
         else:
-            for batch in it(self._iter).chunked(chunksize):
-                with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='PyIter worker') as executor:
-                    yield from executor.map(self._transformer, batch)
+            with create_executor(max_workers) as executor:
+                yield from executor.map(self._transformer, self._iter, chunksize=chunksize)
+
+    
 
 
 class IndexedValue(Generic[T]):
@@ -1608,13 +1876,17 @@ class IndexingSequence(Sequence[IndexedValue[T]]):
 
 
 class FlatteningSequence(Sequence[R]):
-    def __init__(self, iterable: Iterable[Sequence[T]], transformer: Callable[[T], R]) -> None:
+    def __init__(self, iterable: Iterable[Sequence[T]], transformer: Optional[Callable[[T], R]]=None) -> None:
         super().__init__(iterable)
         self._transformer = transformer
     
     def __do_iter__(self) -> Iterator[R]:
-        for i in self._iter:
-            yield from self._transformer(i)
+        if self._transformer:
+            for i in self._iter:
+                yield from self._transformer(i)
+        else:
+            for i in self._iter:
+                yield from i
 
 
 class DropSequence(Sequence[T]):
@@ -1689,7 +1961,40 @@ class MergingSequence(Sequence[V]):
                 break
 
 
-class GroupingSequence(Sequence[Tuple[K, List[T]]]):
+class MergingWithNextSequence(Sequence[V]):
+    def __init__(self, 
+    iterable: Iterable[T], 
+    transformer: Callable[[T, R], V] = lambda a,b:(a,b)) -> None:
+        super().__init__(iterable)
+        self._transformer = transformer
+    
+    def __do_iter__(self) -> Iterator[V]:
+        it = iter(self._iter)
+        try:
+            c = next(it)
+            while True:
+                n = next(it)
+                yield self._transformer(c, n)
+                c = n
+        except StopIteration:
+            pass
+
+
+class DistinctSequence(Sequence[T]):
+    def __init__(self, iterable: Iterable[T], key_selector: Optional[Callable[[T], K]]=None) -> None:
+        super().__init__(iterable)
+        self._key_selector = key_selector
+    
+    def __do_iter__(self) -> Iterator[T]:
+        seen = set()
+        for e in self._iter:
+            k = self._key_selector(e) if self._key_selector else e
+            if k not in seen:
+                seen.add(k)
+                yield e
+
+
+class GroupingSequence(Sequence[Tuple[K, Sequence[T]]]):
     def __init__(self, iterable: Iterable[T], key_func: Callable[[T], K]) -> None:
         super().__init__(iterable)
         self._key_func = key_func
@@ -1699,19 +2004,19 @@ class GroupingSequence(Sequence[Tuple[K, List[T]]]):
         return self.map(lambda x: x[0])
     
     @property
-    def values(self) -> Sequence[List[T]]:
+    def values(self) -> Sequence[Sequence[T]]:
         return self.map(lambda x: x[1])
     
     @property
-    def items(self) -> Sequence[Tuple[K, List[T]]]:
+    def items(self) -> Sequence[Tuple[K, Sequence[T]]]:
         return self
     
-    def __do_iter__(self) -> Iterator[Tuple[K, List[T]]]:
+    def __do_iter__(self) -> Iterator[Tuple[K, Sequence[T]]]:
         from collections import defaultdict
         d = defaultdict(list)
         for e in self._iter:
             d[self._key_func(e)].append(e)
-        yield from d.items()
+        yield from it(d.items()).map(lambda x: (x[0], it(x[1])))
 
 
 class CombinationSequence(Sequence[Tuple[T, ...]]):
@@ -1755,6 +2060,21 @@ class ConcatSequence(Sequence[T]):
             yield from i
 
 
+class ShufflingSequence(Sequence[T]):
+    def __init__(self, iterable: Iterable[T], random: Optional[Union[Random, str, int]]=None) -> None:
+        super().__init__(iterable)
+        if random is None or isinstance(random, (str, int)):
+            from random import Random
+            self._random = Random(random)
+        else:
+            self._random = random
+    
+    def __do_iter__(self) -> Iterator[T]:
+        lst = self._iter._cache.copy() if isinstance(self._iter, Sequence) and self._iter._cache is not None else list(self._iter)
+        self._random.shuffle(lst)
+        yield from lst
+
+
 class ProgressSequence(Sequence[T]):
     def __init__(self, iterable: Sequence[T], progress_func: Callable[[Iterable[T]], Iterable[T]]) -> None:
         super().__init__(iterable)
@@ -1789,15 +2109,15 @@ def sequence(elements: List[T]) -> Sequence[T]:
      Creates an iterator from a list of elements or given Iterable.
     
      Example 1:
-    >>> sequence('hello', 'world').map(lambda x: x.upper())
+    >>> sequence('hello', 'world').map(lambda x: x.upper()).to_list()
     ['HELLO', 'WORLD']
 
      Example 2:
-    >>> sequence(['hello', 'world']).map(lambda x: x.upper())
+    >>> sequence(['hello', 'world']).map(lambda x: x.upper()).to_list()
     ['HELLO', 'WORLD']
 
      Example 3:
-    >>> sequence(range(10)).map(lambda x: x*x)
+    >>> sequence(range(10)).map(lambda x: x*x).to_list()
     [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
     """
     ...
@@ -1812,18 +2132,18 @@ def sequence(*iterable: Iterable[T]) -> Sequence[T]:
      Creates an iterator from a list of elements or given Iterable.
     
      Example 1:
-    >>> sequence('hello', 'world').map(lambda x: x.upper())
+    >>> sequence('hello', 'world').map(lambda x: x.upper()).to_list()
     ['HELLO', 'WORLD']
 
      Example 2:
-    >>> sequence(['hello', 'world']).map(lambda x: x.upper())
+    >>> sequence(['hello', 'world']).map(lambda x: x.upper()).to_list()
     ['HELLO', 'WORLD']
 
      Example 3:
-    >>> sequence(range(10)).map(lambda x: x*x)
+    >>> sequence(range(10)).map(lambda x: x*x).to_list()
     [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
     """
-    if len(iterable) == 1 and isinstance(iterable[0], Iterable):
+    if len(iterable) == 1 and isinstance(iterable[0], Iterable) and not isinstance(iterable[0], str):
         return Sequence(iterable[0])
     return Sequence(iterable)
 
@@ -1833,15 +2153,15 @@ seq = sequence
     Creates an iterator from a list of elements or given Iterable.
 
     Example 1:
->>> seq('hello', 'world').map(lambda x: x.upper())
+>>> seq('hello', 'world').map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 2:
->>> seq(['hello', 'world']).map(lambda x: x.upper())
+>>> seq(['hello', 'world']).map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 3:
->>> seq(range(10)).map(lambda x: x*x)
+>>> seq(range(10)).map(lambda x: x*x).to_list()
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 """
 
@@ -1851,15 +2171,15 @@ iterate = sequence
     Creates an iterator from a list of elements or given Iterable.
 
     Example 1:
->>> iterate('hello', 'world').map(lambda x: x.upper())
+>>> iterate('hello', 'world').map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 2:
->>> iterate(['hello', 'world']).map(lambda x: x.upper())
+>>> iterate(['hello', 'world']).map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 3:
->>> iterate(range(10)).map(lambda x: x*x)
+>>> iterate(range(10)).map(lambda x: x*x).to_list()
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 """
 
@@ -1869,15 +2189,15 @@ it = sequence
     Creates an iterator from a list of elements or given Iterable.
 
     Example 1:
->>> it('hello', 'world').map(lambda x: x.upper())
+>>> it('hello', 'world').map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 2:
->>> it(['hello', 'world']).map(lambda x: x.upper())
+>>> it(['hello', 'world']).map(lambda x: x.upper()).to_list()
 ['HELLO', 'WORLD']
 
     Example 3:
->>> it(range(10)).map(lambda x: x*x)
+>>> it(range(10)).map(lambda x: x*x).to_list()
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 """
 
