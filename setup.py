@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name='pyiter',
-    version='0.2.7',
+    version='0.3.2',
     keywords=('linq', 'iterator', 'typing', 'lazy evaluation', 'type inference'),
     description='PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、TypeSrcipt '
                 'and Rust . Enables strong typing and type inference for iterative operations.',
@@ -13,6 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     author='YISH',
     author_email="mokeyish@hotmail.com",
+    url= 'https://github.com/mokeyish/pyiter',
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
     license='MIT',

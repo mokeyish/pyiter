@@ -1500,6 +1500,55 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return MergingWithNextSequence(self, transform or (lambda a, b: (a, b)))
     
+    
+    @overload
+    def unzip(self: Sequence[Tuple[R, V]], as_sequence: Literal[True]) -> Tuple[Sequence[R], Sequence[V]] :
+        ...
+    @overload
+    def unzip(self: Sequence[Tuple[R, V]]) -> Tuple[List[R], List[V]]:
+        ...
+    @overload
+    def unzip(self, transform: Optional[Callable[[T], Tuple[R, V]]], as_sequence: Literal[True]) -> Tuple[Sequence[R], Sequence[V]]:
+        ...
+    @overload
+    def unzip(self, transform: Optional[Callable[[T], Tuple[R, V]]]) -> Tuple[List[R], List[V]]:
+        ...
+    def unzip(self, transform: Union[Optional[Callable[[T], Tuple[R, V]]], bool]=None, as_sequence: bool=False):
+        """
+         Returns a pair of lists, where first list is built from the first values of each pair from this array, second list is built from the second values of each pair from this array.
+
+         Example 1:
+        >>> lst = [{'name': 'a', 'age': 11}, {'name': 'b', 'age': 12}, {'name': 'c', 'age': 13}]
+        >>> a, b = it(lst).unzip(lambda x: (x['name'], x['age']))
+        >>> a
+        ['a', 'b', 'c']
+        >>> b
+        [11, 12, 13]
+        
+         Example 1:
+        >>> lst = [('a', 11), ('b', 12), ('c', 13)]
+        >>> a, b = it(lst).unzip()
+        >>> a
+        ['a', 'b', 'c']
+        >>> b
+        [11, 12, 13]
+        """
+        it = self
+        if type(transform) == bool:
+            as_sequence = transform
+            transform = None
+
+        if transform is not None:
+            it = it.map(transform)
+        
+        a = it.map(lambda x: x[0])
+        b = it.map(lambda x: x[1])
+
+        if not as_sequence:
+            return a.to_list(), b.to_list()
+        return a, b
+
+
     def with_index(self):
         """
          Returns a sequence containing the elements of this sequence and their indexes.
@@ -1564,6 +1613,32 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return ShufflingSequence(self, random)
     
+    @overload
+    def partition(self, predicate: Callable[[T], bool]) -> Tuple[List[T], List[T]]:
+        """
+         Partitions the elements of the given Sequence into two groups,
+         the first group containing the elements for which the predicate returns true,
+         and the second containing the rest.
+
+         Example 1:
+        >>> lst = ['a', 'b', 'c', '2']
+        >>> it(lst).partition(lambda x: x.isalpha())
+        (['a', 'b', 'c'], ['2'])
+        """
+        ...
+    @overload
+    def partition(self, predicate: Callable[[T], bool], as_sequence: Literal[True]) -> Tuple[Sequence[T], Sequence[T]]:
+        """
+         Partitions the elements of the given Sequence into two groups,
+         the first group containing the elements for which the predicate returns true,
+         and the second containing the rest.
+
+         Example 1:
+        >>> lst = ['a', 'b', 'c', '2']
+        >>> it(lst).partition(lambda x: x.isalpha(), as_sequence=True)
+        (['a', 'b', 'c'], ['2'])
+        """
+        ...
     def partition(self, predicate: Callable[[T], bool], as_sequence: bool=False) -> Tuple[Sequence[T], Sequence[T]]:
         """
          Partitions the elements of the given Sequence into two groups,
@@ -1578,8 +1653,7 @@ class Sequence(Generic[T], Iterable[T]):
         part_a = self.filter(predicate)
         part_b = self.filter(lambda x: not predicate(x))
         if not as_sequence:
-            part_a = part_a.to_list()
-            part_b = part_b.to_list()
+            return part_a.to_list(), part_b.to_list()
         return part_a, part_b 
     
 
@@ -1693,6 +1767,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return separator.join(self)
     
+
     def progress(self, progress_func: Callable[[Iterable[T]], Iterable[T]]) -> Sequence[T]:
         """
          Returns a Sequence that enable a progress bar for the given Sequence.
@@ -1705,6 +1780,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return ProgressSequence(self, progress_func)
 
+
     def to_set(self) -> Set[T]:
         """
          Returns a set containing all elements of this Sequence.
@@ -1715,7 +1791,14 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return set(self)
 
+
+    @overload
+    def to_dict(self: Sequence[Tuple[K, V]]) -> Dict[K, V]:
+        ...
+    @overload
     def to_dict(self, transform: Callable[[T], Tuple[K, V]]) -> Dict[K, V]:
+        ...
+    def to_dict(self, transform: Optional[Callable[[T], Tuple[K, V]]]=None) -> Dict[K, V]:
         """
          Returns a [Dict] containing key-value Tuple provided by [transform] function
         applied to elements of the given Sequence.
@@ -1725,8 +1808,13 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).to_dict(lambda x: (int(x), x))
         {1: '1', 2: '2', 3: '3'}
 
+         Example 2:
+        >>> lst = [(1, '1'), (2, '2'), (3, '3')]
+        >>> it(lst).to_dict()
+        {1: '1', 2: '2', 3: '3'}
+
         """
-        return self.associate(transform)
+        return self.associate(transform or (lambda x: x))
 
     def to_list(self) -> List[T]:
         """
