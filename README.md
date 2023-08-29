@@ -22,9 +22,16 @@ pip install pyiter
 from pyiter import iterate as it
 from tqdm import tqdm
 
+
 text = ["hello", "world"]
 it(text).map(str.upper).to_list()
 # ['HELLO', 'WORLD']
+
+
+words = 'I dont want to believe I want to know'.split()
+it(words).group_by(lambda x: x).map(lambda w: (w[0], w[1].count())).to_list()
+# [('I', 2), ('dont', 1), ('want', 2), ('to', 2), ('believe', 1), ('know', 1)]
+
 
 # use tqdm
 it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()

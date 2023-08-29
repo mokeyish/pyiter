@@ -1115,6 +1115,69 @@ class Sequence(Generic[T], Iterable[T]):
         return max(selector(i) for i in self)
     
     @overload
+    def max_by_or_none(self, selector: Callable[[T], int]) -> Optional[T]:
+        ...
+    @overload
+    def max_by_or_none(self, selector: Callable[[T], float]) -> Optional[T]:
+        ...
+    def max_by_or_none(self, selector: Callable[[T], Union[float, int]]) -> Optional[T]:
+        """
+         Returns the first element yielding the largest value of the given function
+         or `none` if there are no elements.
+
+         Example 1:
+        >>> lst = [ { "name": "A", "num": 100 }, { "name": "B", "num": 200 }]
+        >>> it(lst).max_by_or_none(lambda x: x["num"])
+        {'name': 'B', 'num': 200}
+
+         Exmaple 2:
+        >>> lst = []
+        >>> it(lst).max_by_or_none(lambda x: x["num"])
+        
+        """
+
+        max_item = None
+        max_val = None
+
+        for item in self:
+            val = selector(item)
+            if max_val is None or val > max_val:
+                max_item = item
+                max_val = val
+        
+        return max_item
+    
+    
+    @overload
+    def max_by(self, selector: Callable[[T], int]) -> T:
+        ...
+    @overload
+    def max_by(self, selector: Callable[[T], float]) -> T:
+        ...
+    def max_by(self, selector: Callable[[T], Union[float, int]]) -> T:
+        """
+         Returns the first element yielding the largest value of the given function.
+
+         Example 1:
+        >>> lst = [ { "name": "A", "num": 100 }, { "name": "B", "num": 200 }]
+        >>> it(lst).max_by(lambda x: x["num"])
+        {'name': 'B', 'num': 200}
+        
+         Exmaple 2:
+        >>> lst = []
+        >>> it(lst).max_by(lambda x: x["num"])
+        Traceback (most recent call last):
+        ...
+        ValueError: Sequence is empty.
+
+
+        """
+        max_item = self.max_by_or_none(selector)
+        if max_item is None:
+            raise ValueError("Sequence is empty.")
+        return max_item
+
+    @overload
     def min_of(self, selector: Callable[[T], int]) -> int:
         """
          Returns the minimum element of the given Sequence.
@@ -1131,6 +1194,69 @@ class Sequence(Generic[T], Iterable[T]):
         ...
     def min_of(self, selector: Callable[[T], Union[int, float]]) -> Union[int, float]:
         return min(selector(i) for i in self)
+    
+    
+    @overload
+    def min_by_or_none(self, selector: Callable[[T], int]) -> Optional[T]:
+        ...
+    @overload
+    def min_by_or_none(self, selector: Callable[[T], float]) -> Optional[T]:
+        ...
+    def min_by_or_none(self, selector: Callable[[T], float]) -> Optional[T]:
+        """
+         Returns the first element yielding the smallest value of the given function
+         or `none` if there are no elements.
+        
+         Example 1:
+        >>> lst = [ { "name": "A", "num": 100 }, { "name": "B", "num": 200 }]
+        >>> it(lst).min_by_or_none(lambda x: x["num"])
+        {'name': 'A', 'num': 100}
+        
+         Exmaple 2:
+        >>> lst = []
+        >>> it(lst).min_by_or_none(lambda x: x["num"])
+        
+        
+        """        
+        min_item = None
+        min_val = None
+
+        for item in self:
+            val = selector(item)
+            if min_val is None or val < min_val:
+                min_item = item
+                min_val = val
+
+        return min_item
+    
+    @overload
+    def min_by(self, selector: Callable[[T], int]) -> T:
+        ...
+    @overload
+    def min_by(self, selector: Callable[[T], float]) -> T:
+        ...
+    def min_by(self, selector: Callable[[T], float]) -> T:
+        """
+         Returns the first element yielding the smallest value of the given function.
+        
+         Example 1:
+        >>> lst = [ { "name": "A", "num": 100 }, { "name": "B", "num": 200 }]
+        >>> it(lst).min_by(lambda x: x["num"])
+        {'name': 'A', 'num': 100}
+        
+         Exmaple 2:
+        >>> lst = []
+        >>> it(lst).min_by(lambda x: x["num"])
+        Traceback (most recent call last):
+        ...
+        ValueError: Sequence is empty.
+        
+        """        
+        min_item = self.min_by_or_none(selector)
+        if min_item is None:
+            raise ValueError("Sequence is empty.")
+        
+        return min_item
     
     def mean_of(self, selector: Callable[[T], Union[int, float]]) -> Union[int, float]:
         """
