@@ -49,7 +49,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).filter_indexed(lambda x, i: i == 2).to_list()
         ['b2']
         """
-        return IndexingSequence(self).filter(lambda x: predicate(x.value, x.index)).map(lambda x: x.value)
+        return self.indexed().filter(lambda x: predicate(x.value, x.index)).map(lambda x: x.value)
 
     def filter_is_instance(self, r_type: Type[R]) -> Sequence[R]:
         """
@@ -108,7 +108,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).map_indexed(lambda x, i: x['age'] + i).to_list()
         [12, 14]
         """
-        return IndexingSequence(self).map(lambda x: transform(x.value, x.index))
+        return self.indexed().map(lambda x: transform(x.value, x.index))
 
     
     def map_not_none(self, transform: Callable[[T], Optional[R]]) -> Sequence[R]:
@@ -225,23 +225,23 @@ class Sequence(Generic[T], Iterable[T]):
         ...
         ValueError: No element of the Sequence was transformed to a non-none value.
         """
-        v = self.first_not_null_of_or_none(transform)
+        v = self.first_not_none_of_or_none(transform)
         if v is None:
             raise ValueError('No element of the Sequence was transformed to a non-none value.')
         return v
     
-    def first_not_null_of_or_none(self, transform: Callable[[T], Optional[R]]) -> Optional[R]:
+    def first_not_none_of_or_none(self, transform: Callable[[T], Optional[R]]) -> Optional[R]:
         """
          Returns the first non-`None` result of applying the given [transform] function to each element in the original collection.
 
          Example 1:
         >>> lst = [{ 'name': 'A', 'age': None}, { 'name': 'B', 'age': 12}]
-        >>> it(lst).first_not_null_of_or_none(lambda x: x['age'])
+        >>> it(lst).first_not_none_of_or_none(lambda x: x['age'])
         12
 
          Example 2:
         >>> lst = [{ 'name': 'A', 'age': None}, { 'name': 'B', 'age': None}]
-        >>> it(lst).first_not_null_of_or_none(lambda x: x['age']) is None
+        >>> it(lst).first_not_none_of_or_none(lambda x: x['age']) is None
         True
         """
         return self.map_not_none(transform).first_or_none()
@@ -1782,6 +1782,33 @@ class Sequence(Generic[T], Iterable[T]):
             return part_a.to_list(), part_b.to_list()
         return part_a, part_b 
     
+    
+    @overload
+    def partition_indexed(self, predicate: Callable[[T, int], bool]) -> Tuple[List[T], List[T]]:
+        ...
+    @overload
+    def partition_indexed(self, predicate: Callable[[T, int], bool], as_sequence: Literal[True]) -> Tuple[Sequence[T], Sequence[T]]:
+        ...
+    def partition_indexed(self, predicate: Callable[[T, int], bool], as_sequence: bool=False) -> Tuple[Sequence[T], Sequence[T]]:
+        """
+         Partitions the elements of the given Sequence into two groups,
+         the first group containing the elements for which the predicate returns true,
+         and the second containing the rest.
+
+         Example 1:
+        >>> lst = ['a', 'b', 'c', '2']
+        >>> it(lst).partition_indexed(lambda x, i: i % 2 == 0)
+        (['a', 'c'], ['b', '2'])
+        """
+        indexed = self.indexed()
+        part_a = indexed.filter(lambda x: predicate(x.value, x.index)).map(lambda x: x.value)
+        part_b = indexed.filter(lambda x: not predicate(x.value, x.index)).map(lambda x: x.value)
+        if not as_sequence:
+            return part_a.to_list(), part_b.to_list()
+        return part_a, part_b 
+    
+    def indexed(self) -> IndexingSequence[T]:
+        return IndexingSequence(self)
 
     @overload
     def combinations(self, n: Literal[2]) -> Sequence[Tuple[T, T]]: 
@@ -1861,6 +1888,17 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return self.windowed(size, size, True)
 
+    def repeat(self, n: int) -> Sequence[T]:
+        """
+         Returns a Sequence containing this sequence repeated n times.
+
+         Example 1:
+        >>> lst = ['a', 'b']
+        >>> it(lst).repeat(3).to_list()
+        ['a', 'b', 'a', 'b', 'a', 'b']
+        """
+
+        return ConcatSequence([self] * n)
     
     def concat(self, *other: Sequence[T]) -> Sequence[T]:
         """
