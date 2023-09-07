@@ -8,6 +8,11 @@ if TYPE_CHECKING:
     from random import Random
 
 import sys
+if sys.version_info.major == 3 and sys.version_info.minor < 11:
+    # Generic NamedTuple 
+    origin__namedtuple_mro_entries =  NamedTuple.__mro_entries__
+    NamedTuple.__mro_entries__ = lambda bases: origin__namedtuple_mro_entries(bases[:1])
+
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -1673,7 +1678,7 @@ class Sequence(Generic[T], Iterable[T]):
 
          Example 1:
         >>> lst = [1, 2, 3, 4, 5]
-        >>> it(lst).group_by(lambda x: x%2).map(lambda x: (x[0], x[1].to_list())).to_list()
+        >>> it(lst).group_by(lambda x: x%2).map(lambda x: (x.key, x.values.to_list())).to_list()
         [(1, [1, 3, 5]), (0, [2, 4])]
         """
         return GroupingSequence(self, callback_overload_warpper(key_selector, self))
@@ -2412,12 +2417,6 @@ class ParallelMappingSequence(Sequence[R]):
                 yield from executor.map(self._transformer, self._iter, chunksize=chunksize)
 
 
-if sys.version_info.major == 3 and sys.version_info.minor < 11:
-    # Generic NamedTuple 
-    origin__namedtuple_mro_entries =  NamedTuple.__mro_entries__
-    NamedTuple.__mro_entries__ = lambda bases: origin__namedtuple_mro_entries(bases[:1])
-
-
 class IndexedValue(NamedTuple, Generic[T]):
     value: T
     index: int
@@ -2554,29 +2553,34 @@ class DistinctSequence(Sequence[T]):
                 yield e
 
 
-class GroupingSequence(Sequence[Tuple[K, Sequence[T]]]):
+class Grouping(NamedTuple, Generic[K, T]):
+    key: K
+    values: Sequence[T]
+
+
+class GroupingSequence(Sequence[Grouping[K, T]]):
     def __init__(self, iterable: Iterable[T], key_func: Callable[[T], K]) -> None:
         super().__init__(iterable)
         self._key_func = key_func
     
     @property
     def keys(self) -> Sequence[K]:
-        return self.map(lambda x: x[0])
+        return self.map(lambda x: x.key)
     
     @property
     def values(self) -> Sequence[Sequence[T]]:
-        return self.map(lambda x: x[1])
+        return self.map(lambda x: x.values)
     
     @property
-    def items(self) -> Sequence[Tuple[K, Sequence[T]]]:
+    def items(self) -> Sequence[Grouping[K, T]]:
         return self
     
-    def __do_iter__(self) -> Iterator[Tuple[K, Sequence[T]]]:
+    def __do_iter__(self) -> Iterator[Grouping[K, T]]:
         from collections import defaultdict
         d = defaultdict(list)
         for e in self._iter:
             d[self._key_func(e)].append(e)
-        yield from it(d.items()).map(lambda x: (x[0], it(x[1])))
+        yield from it(d.items()).map(lambda x: Grouping(x[0], it(x[1])))
 
 
 class CombinationSequence(Sequence[Tuple[T, ...]]):

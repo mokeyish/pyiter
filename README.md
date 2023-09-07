@@ -29,7 +29,7 @@ it(text).map(str.upper).to_list()
 
 
 words = 'I dont want to believe I want to know'.split()
-it(words).group_by(lambda x: x).map(lambda w: (w[0], w[1].count())).to_list()
+it(words).group_by(lambda x: x).map(lambda g: (g.key, g.values.count())).to_list()
 # [('I', 2), ('dont', 1), ('want', 2), ('to', 2), ('believe', 1), ('know', 1)]
 
 
