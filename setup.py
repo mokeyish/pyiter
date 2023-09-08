@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name='pyiter',
-    version='0.6.1',
-    keywords=('linq', 'iterator', 'typing', 'lazy evaluation', 'type inference'),
+    version='0.6.3',
+    keywords=['linq', 'iterator', 'typing', 'lazy evaluation', 'type inference'],
     description='PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、TypeSrcipt '
                 'and Rust . Enables strong typing and type inference for iterative operations.',
     long_description=long_description,
@@ -18,4 +18,7 @@ setup(
     packages=find_packages(where='src'),
     license='MIT',
     python_requires='>=3.8',
+    install_requires = [
+        'Deprecated'
+    ]
 )
