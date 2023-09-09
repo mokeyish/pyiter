@@ -637,7 +637,7 @@
 </span><span id="L-98"><a href="#L-98"><span class="linenos">  98</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x: x.startswith(&#39;a&#39;)).to_list()</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos">  99</span></a><span class="sd">        [&#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos"> 100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos"> 101</span></a><span class="sd">        Example 1:</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos"> 101</span></a><span class="sd">        Example 2:</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos"> 102</span></a><span class="sd">        &gt;&gt;&gt; lst = [ &#39;a1&#39;, &#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos"> 103</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x, i: x.startswith(&#39;a&#39;) and i % 2 == 0 ).to_list()</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos"> 104</span></a><span class="sd">        [&#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
@@ -3311,7 +3311,7 @@
 </span><span id="Sequence-99"><a href="#Sequence-99"><span class="linenos">  99</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x: x.startswith(&#39;a&#39;)).to_list()</span>
 </span><span id="Sequence-100"><a href="#Sequence-100"><span class="linenos"> 100</span></a><span class="sd">        [&#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="Sequence-101"><a href="#Sequence-101"><span class="linenos"> 101</span></a>
-</span><span id="Sequence-102"><a href="#Sequence-102"><span class="linenos"> 102</span></a><span class="sd">        Example 1:</span>
+</span><span id="Sequence-102"><a href="#Sequence-102"><span class="linenos"> 102</span></a><span class="sd">        Example 2:</span>
 </span><span id="Sequence-103"><a href="#Sequence-103"><span class="linenos"> 103</span></a><span class="sd">        &gt;&gt;&gt; lst = [ &#39;a1&#39;, &#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="Sequence-104"><a href="#Sequence-104"><span class="linenos"> 104</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x, i: x.startswith(&#39;a&#39;) and i % 2 == 0 ).to_list()</span>
 </span><span id="Sequence-105"><a href="#Sequence-105"><span class="linenos"> 105</span></a><span class="sd">        [&#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
@@ -5606,7 +5606,7 @@ provided by that function.</p>
 </span><span id="Sequence.filter_not-99"><a href="#Sequence.filter_not-99"><span class="linenos"> 99</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x: x.startswith(&#39;a&#39;)).to_list()</span>
 </span><span id="Sequence.filter_not-100"><a href="#Sequence.filter_not-100"><span class="linenos">100</span></a><span class="sd">        [&#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="Sequence.filter_not-101"><a href="#Sequence.filter_not-101"><span class="linenos">101</span></a>
-</span><span id="Sequence.filter_not-102"><a href="#Sequence.filter_not-102"><span class="linenos">102</span></a><span class="sd">        Example 1:</span>
+</span><span id="Sequence.filter_not-102"><a href="#Sequence.filter_not-102"><span class="linenos">102</span></a><span class="sd">        Example 2:</span>
 </span><span id="Sequence.filter_not-103"><a href="#Sequence.filter_not-103"><span class="linenos">103</span></a><span class="sd">        &gt;&gt;&gt; lst = [ &#39;a1&#39;, &#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
 </span><span id="Sequence.filter_not-104"><a href="#Sequence.filter_not-104"><span class="linenos">104</span></a><span class="sd">        &gt;&gt;&gt; it(lst).filter_not(lambda x, i: x.startswith(&#39;a&#39;) and i % 2 == 0 ).to_list()</span>
 </span><span id="Sequence.filter_not-105"><a href="#Sequence.filter_not-105"><span class="linenos">105</span></a><span class="sd">        [&#39;a2&#39;, &#39;b1&#39;, &#39;b2&#39;]</span>
@@ -5627,7 +5627,7 @@ provided by that function.</p>
 </code></pre>
 </div>
 
-<p>Example 1:</p>
+<p>Example 2:</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">lst</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="s1">&#39;b1&#39;</span><span class="p">,</span> <span class="s1">&#39;b2&#39;</span><span class="p">]</span>

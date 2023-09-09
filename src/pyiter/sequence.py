@@ -98,7 +98,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).filter_not(lambda x: x.startswith('a')).to_list()
         ['b1', 'b2']
 
-        Example 1:
+        Example 2:
         >>> lst = [ 'a1', 'a2', 'b1', 'b2']
         >>> it(lst).filter_not(lambda x, i: x.startswith('a') and i % 2 == 0 ).to_list()
         ['a2', 'b1', 'b2']
