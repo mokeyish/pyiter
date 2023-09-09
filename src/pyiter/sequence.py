@@ -1,17 +1,17 @@
 from __future__ import annotations
+from deprecated import deprecated
 from typing import (
     overload, Any, List, Set, Dict, Deque, DefaultDict, Generic, Iterable, Iterator, Union, 
     Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple,
     TYPE_CHECKING
 )
-from deprecated import deprecated
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparisonT
     from random import Random
 
 import sys
 if sys.version_info.major == 3 and sys.version_info.minor < 11:
-    # Generic NamedTuple 
+    # Generic NamedTuple
     origin__namedtuple_mro_entries =  NamedTuple.__mro_entries__ # type: ignore
     NamedTuple.__mro_entries__ = lambda bases: origin__namedtuple_mro_entries(bases[:1]) # type: ignore
 
@@ -23,50 +23,6 @@ K = TypeVar("K")
 V = TypeVar("V")
 
 IterableS = TypeVar("IterableS", bound=Iterable[Any])
-
-
-class SequenceTransform(Generic[IterableS, R], Iterable[R]):
-    _iter: IterableS
-    _cache: Optional[List[R]]
-
-    def __init__(self, iterable: IterableS) -> None:
-        super().__init__()
-        self._iter = iterable
-        self._cache = None
-    
-    def __iter__(self) -> Iterator[R]:
-        if self._cache:
-            yield from self._cache
-        else:
-            cache: List[R] = []
-            for x in self.__do_iter__():
-                cache.append(x)
-                yield x
-            self._cache = cache
-
-    def __do_iter__(self) -> Iterator[R] :
-        yield from self._iter
-
-    def __len__(self) -> int:
-        if not isinstance(self._iter, Sequence):
-            # not Sequence, just a wrapper of List, Tuple.etc.
-            # we can get lenght of it directly.
-            if hasattr(self._iter, '__len__'):
-                return len(self._iter) # type: ignore
-            elif hasattr(self._iter, '__length_hint__'):
-                return self._iter.__length_hint__() # type: ignore
-        # we need iterate all to get length
-        cache = self._cache
-        if cache is None:
-            for _ in self:
-                pass
-            cache = self._cache
-        if cache is not None:
-            return len(cache)
-        return 0
-    
-    def as_sequence(self) -> Sequence[R]:
-        return it(self)
 
 
 class Sequence(Generic[T], Iterable[T]):
@@ -107,11 +63,11 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).filter(lambda x, i: x.startswith('a') or i % 2 == 0 ).to_list()
         ['a1', 'b2', 'a2']
         """
-        return FilteringSequence(self, self._callback_overload_warpper(predicate)).as_sequence()
+        return FilteringTransform(self, self._callback_overload_warpper(predicate)).as_sequence()
 
     @deprecated(reason="use `.filter(lambda x, idx: ... )` instead.")
     def filter_indexed(self, predicate: Callable[[T, int], bool]) -> Sequence[T]:
-        return self.filter(lambda x, i: predicate(x, i))
+        return self.filter(predicate)
 
     def filter_is_instance(self, typ: Type[R]) -> Sequence[R]:
         """
@@ -124,7 +80,6 @@ class Sequence(Generic[T], Iterable[T]):
 
         """
         return self.filter(lambda x: isinstance(x, typ)) # type: ignore
-
     @overload
     def filter_not(self, predicate: Callable[[T], bool]) -> Sequence[T]:
         ...
@@ -186,7 +141,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).map(lambda x, i: x['name'] + str(i)).to_list()
         ['A0', 'B1']
         """
-        return MappingSequence(self, self._callback_overload_warpper(transform)).as_sequence()
+        return MappingTransform(self, self._callback_overload_warpper(transform)).as_sequence()
     
     @deprecated(reason="use `.map(lambda x, idx: ... )` instead.")
     def map_indexed(self, transform: Callable[[T, int], R]) -> Sequence[R]:
@@ -214,15 +169,15 @@ class Sequence(Generic[T], Iterable[T]):
         return self.map(transform).filter_not_none() # type: ignore
     
     @overload
-    def parallel_map(self, transform: Callable[[T], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread') -> Sequence[R]:
+    def parallel_map(self, transform: Callable[[T], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread') -> Sequence[R]:
         ...
     @overload
-    def parallel_map(self, transform: Callable[[T, int], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread') -> Sequence[R]:
+    def parallel_map(self, transform: Callable[[T, int], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread') -> Sequence[R]:
         ...
     @overload
-    def parallel_map(self, transform: Callable[[T, int, Sequence[T]], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread') -> Sequence[R]:
+    def parallel_map(self, transform: Callable[[T, int, Sequence[T]], R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread') -> Sequence[R]:
         ...
-    def parallel_map(self, transform: Callable[..., R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread') -> Sequence[R]:
+    def parallel_map(self, transform: Callable[..., R], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread') -> Sequence[R]:
         """
         Returns a Sequence containing the results of applying the given [transform] function
         to each element in the original Sequence.
@@ -242,7 +197,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).parallel_map(lambda x, i: x['age'] + i, max_workers=2).to_list()
         [12, 14]
         """
-        return ParallelMappingSequence(self, self._callback_overload_warpper(transform), max_workers, chunksize, executor).as_sequence()
+        return ParallelMappingTransform(self, self._callback_overload_warpper(transform), max_workers, chunksize, executor).as_sequence()
 
     @overload
     def find(self, predicate: Callable[[T], bool]) -> Optional[T]:
@@ -740,7 +695,7 @@ class Sequence(Generic[T], Iterable[T]):
         if n == 0:
             return self
 
-        return DropSequence(self, n).as_sequence()
+        return DropTransform(self, n).as_sequence()
 
     # noinspection PyShadowingNames
     @overload
@@ -761,7 +716,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).drop_while(lambda x: x < 3 ).to_list()
         [3, 4, 1]
         """
-        return DropWhileSequence(self, self._callback_overload_warpper(predicate)).as_sequence()
+        return DropWhileTransform(self, self._callback_overload_warpper(predicate)).as_sequence()
     
     def skip(self, n: int) -> Sequence[T]:
         """
@@ -823,7 +778,7 @@ class Sequence(Generic[T], Iterable[T]):
             raise ValueError(f'Requested element count {n} is less than zero.')
         if n == 0:
             return Sequence([])
-        return TakeSequence(self, n).as_sequence()
+        return TakeTransform(self, n).as_sequence()
 
     # noinspection PyShadowingNames
     @overload
@@ -844,7 +799,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).take_while(lambda x: x in ['a', 'b']).to_list()
         ['a', 'b']
         """
-        return TakeWhileSequence(self, self._callback_overload_warpper(predicate)).as_sequence()
+        return TakeWhileTransform(self, self._callback_overload_warpper(predicate)).as_sequence()
     
     def take_last(self, n: int) -> Sequence[T]:
         """
@@ -1250,7 +1205,7 @@ class Sequence(Generic[T], Iterable[T]):
         [(1, 'A'), (2, 'A'), (3, 'C'), (3, 'D')]
 
         """
-        return DistinctSequence(self).as_sequence()
+        return DistinctTransform(self).as_sequence()
     
     @overload
     def distinct_by(self, key_selector: Callable[[T], Any]) -> Sequence[T]:
@@ -1270,7 +1225,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).distinct_by(lambda x: x%2).to_list()
         [1, 2]
         """
-        return DistinctSequence(self, self._callback_overload_warpper(key_selector)).as_sequence()
+        return DistinctTransform(self, self._callback_overload_warpper(key_selector)).as_sequence()
     
     @overload
     def reduce(self, accumulator: Callable[[T, T], T]) -> T:
@@ -1626,7 +1581,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).flatten().to_list()
         ['a', 'b', 'c', 'd', 'e']
         """
-        return FlatteningSequence(self).as_sequence()
+        return FlatteningTransform(self).as_sequence()
     
     @overload
     def group_by(self, key_selector: Callable[[T], K]) -> Sequence[Grouping[K, T]]:
@@ -1647,7 +1602,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).group_by(lambda x: x%2).map(lambda x: (x.key, x.values.to_list())).to_list()
         [(1, [1, 3, 5]), (0, [2, 4])]
         """
-        return GroupingSequence(self, self._callback_overload_warpper(key_selector)).as_sequence()
+        return GroupingTransform(self, self._callback_overload_warpper(key_selector)).as_sequence()
     
     @overload
     def group_by_to(self, destination: Dict[K, List[T]], key_selector: Callable[[T], K]) -> Dict[K, List[T]]:
@@ -1771,15 +1726,15 @@ class Sequence(Generic[T], Iterable[T]):
         return self
     
     @overload
-    def parallel_on_each(self, action: Callable[[T], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread' ) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[[T], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread' ) -> Sequence[T]:
         ...
     @overload
-    def parallel_on_each(self, action: Callable[[T, int], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread' ) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[[T, int], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread' ) -> Sequence[T]:
         ...
     @overload
-    def parallel_on_each(self, action: Callable[[T, int, Sequence[T]], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread' ) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[[T, int, Sequence[T]], None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread' ) -> Sequence[T]:
         ...
-    def parallel_on_each(self, action: Callable[..., None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingSequence.Executor='Thread' ) -> Sequence[T]:
+    def parallel_on_each(self, action: Callable[..., None], max_workers: Optional[int]=None, chunksize: int=1, executor: ParallelMappingTransform.Executor='Thread' ) -> Sequence[T]:
         """
         Invokes [action] function on each element of the given Sequence.
 
@@ -1798,7 +1753,7 @@ class Sequence(Generic[T], Iterable[T]):
         c
         """
         action = self._callback_overload_warpper(action)
-        for _ in ParallelMappingSequence(self, action, max_workers, chunksize, executor):
+        for _ in ParallelMappingTransform(self, action, max_workers, chunksize, executor):
             pass
         return self
     
@@ -1831,7 +1786,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         if transform is None:
             transform = lambda a, b:(a, b)
-        return MergingSequence(self, other, transform).as_sequence()
+        return MergingTransform(self, other, transform).as_sequence()
     
     @overload
     def zip_with_next(self) -> Sequence[Tuple[T, T]]:
@@ -1854,7 +1809,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).zip_with_next().to_list()
         [('a', 'b'), ('b', 'c')]
         """
-        return MergingWithNextSequence(self, transform or (lambda a, b: (a, b))).as_sequence()
+        return MergingWithNextTransform(self, transform or (lambda a, b: (a, b))).as_sequence()
     
     
     @overload
@@ -1963,7 +1918,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).shuffled(123).to_list()
         ['c', 'b', 'a']
         """
-        return ShufflingSequence(self, random).as_sequence()
+        return ShufflingTransform(self, random).as_sequence()
     
     @overload
     def partition(self, predicate: Callable[[T], bool]) -> Tuple[List[T], List[T]]:
@@ -2045,7 +2000,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).combinations(2).to_list()
         [('a', 'b'), ('a', 'c'), ('b', 'c')]
         """
-        return CombinationSequence(self, n).as_sequence()
+        return CombinationTransform(self, n).as_sequence()
     
 
     def nth(self, n: int) -> T:
@@ -2079,7 +2034,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).windowed(3, 2, True).to_list()
         [['a', 'b', 'c'], ['c', 'd', 'e'], ['e', 'f']]
         """
-        return WindowedSequence(self, size, step, partialWindows).as_sequence()
+        return WindowedTransform(self, size, step, partialWindows).as_sequence()
     
 
     def chunked(self, size: int) -> Sequence[List[T]]:
@@ -2109,7 +2064,7 @@ class Sequence(Generic[T], Iterable[T]):
         ['a', 'b', 'a', 'b', 'a', 'b']
         """
 
-        return ConcatSequence([self] * n).as_sequence()
+        return ConcatTransform([self] * n).as_sequence()
     
     def concat(self, *other: Sequence[T]) -> Sequence[T]:
         """
@@ -2128,7 +2083,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst1).concat(lst2, lst3).to_list()
         ['a', 'b', 'c', 1, 2, 3, 4, 5, 6]
         """
-        return ConcatSequence([self, *other]).as_sequence()
+        return ConcatTransform([self, *other]).as_sequence()
     
 
     def join(self: Sequence[str], separator: str = ' ') -> str:
@@ -2153,7 +2108,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(range(10)).progress(lambda x: tqdm(x, total=len(x))).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
         >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
-        return ProgressSequence(self, progress_func).as_sequence()
+        return ProgressTransform(self, progress_func).as_sequence()
 
 
     def to_set(self) -> Set[T]:
@@ -2285,7 +2240,51 @@ class AutoIncrementIndex:
         return val
 
 
-class FilteringSequence(SequenceTransform[Iterable[T], T]):
+class SequenceTransform(Generic[IterableS, T], Iterable[T]):
+    _iter: IterableS
+    _cache: Optional[List[T]]
+
+    def __init__(self, iterable: IterableS) -> None:
+        super().__init__()
+        self._iter = iterable
+        self._cache = None
+    
+    def __iter__(self) -> Iterator[T]:
+        if self._cache:
+            yield from self._cache
+        else:
+            cache: List[T] = []
+            for x in self.__do_iter__():
+                cache.append(x)
+                yield x
+            self._cache = cache
+
+    def __do_iter__(self) -> Iterator[T] :
+        yield from self._iter
+
+    def __len__(self) -> int:
+        if not isinstance(self._iter, SequenceTransform):
+            # not Sequence, just a wrapper of List, Tuple.etc.
+            # we can get lenght of it directly.
+            if hasattr(self._iter, '__len__'):
+                return len(self._iter) # type: ignore
+            elif hasattr(self._iter, '__length_hint__'):
+                return self._iter.__length_hint__() # type: ignore
+        # we need iterate all to get length
+        cache = self._cache
+        if cache is None:
+            for _ in self:
+                pass
+            cache = self._cache
+        if cache is not None:
+            return len(cache)
+        return 0
+    
+    def as_sequence(self) -> Sequence[T]:
+        return it(self)
+
+
+class FilteringTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
         super().__init__(iterable)
         self._predicate = predicate
@@ -2296,7 +2295,7 @@ class FilteringSequence(SequenceTransform[Iterable[T], T]):
                 yield i
     
 
-class MappingSequence(SequenceTransform[Iterable[T], R]):
+class MappingTransform(SequenceTransform[Iterable[T], R]):
     def __init__(self, iterable: Iterable[T], transform: Callable[[T], R]) -> None:
         super().__init__(iterable)
         self._transform = transform
@@ -2306,7 +2305,7 @@ class MappingSequence(SequenceTransform[Iterable[T], R]):
             yield self._transform(i)
 
 
-class ParallelMappingSequence(SequenceTransform[Sequence[T], R]):
+class ParallelMappingTransform(SequenceTransform[Sequence[T], R]):
     Executor = Literal['Thread', 'Process']
 
     def __init__(
@@ -2315,7 +2314,7 @@ class ParallelMappingSequence(SequenceTransform[Sequence[T], R]):
             transformer: Callable[[T], R], 
             max_workers: Optional[int]=None, 
             chunksize: int=1,
-            executor: ParallelMappingSequence.Executor = 'Thread') -> None:
+            executor: ParallelMappingTransform.Executor = 'Thread') -> None:
 
         super().__init__(iterable)
         self._transformer = transformer
@@ -2359,7 +2358,7 @@ class IndexedValue(NamedTuple, Generic[T]):
         return f'IndexedValue({self.idx}, {self.val})'
 
 
-class FlatteningSequence(SequenceTransform[Iterable[Iterable[T]], T]):
+class FlatteningTransform(SequenceTransform[Iterable[Iterable[T]], T]):
     def __init__(self, iterable: Iterable[Iterable[T]]) -> None:
         super().__init__(iterable)
     
@@ -2368,7 +2367,7 @@ class FlatteningSequence(SequenceTransform[Iterable[Iterable[T]], T]):
             yield from i
 
 
-class DropSequence(SequenceTransform[Iterable[T], T]):
+class DropTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
         super().__init__(iterable)
         self._n = n
@@ -2380,7 +2379,7 @@ class DropSequence(SequenceTransform[Iterable[T], T]):
             yield e
 
 
-class DropWhileSequence(SequenceTransform[Iterable[T], T]):
+class DropWhileTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
         super().__init__(iterable)
         self._predicate = predicate
@@ -2395,7 +2394,7 @@ class DropWhileSequence(SequenceTransform[Iterable[T], T]):
             yield e
 
 
-class TakeSequence(SequenceTransform[Iterable[T], T]):
+class TakeTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
         super().__init__(iterable)
         self._n = n
@@ -2407,7 +2406,7 @@ class TakeSequence(SequenceTransform[Iterable[T], T]):
             yield e
 
 
-class TakeWhileSequence(SequenceTransform[Iterable[T], T]):
+class TakeWhileTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], predicate: Callable[[T], bool]) -> None:
         super().__init__(iterable)
         self._predicate = predicate
@@ -2421,7 +2420,7 @@ class TakeWhileSequence(SequenceTransform[Iterable[T], T]):
                 break
 
 
-class MergingSequence(SequenceTransform[Iterable[T], V]):
+class MergingTransform(SequenceTransform[Iterable[T], V]):
     def __init__(self, 
         iterable: Iterable[T], 
         other: Iterable[R],
@@ -2441,7 +2440,7 @@ class MergingSequence(SequenceTransform[Iterable[T], V]):
                 break
 
 
-class MergingWithNextSequence(SequenceTransform[Iterable[T], V]):
+class MergingWithNextTransform(SequenceTransform[Iterable[T], V]):
     def __init__(self, 
     iterable: Iterable[T], 
     transformer: Callable[[T, T], V] = lambda a,b:(a,b)) -> None:
@@ -2460,7 +2459,7 @@ class MergingWithNextSequence(SequenceTransform[Iterable[T], V]):
             pass
 
 
-class DistinctSequence(SequenceTransform[Iterable[T], T]):
+class DistinctTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], key_selector: Optional[Callable[[T], Any]]=None) -> None:
         super().__init__(iterable)
         self._key_selector = key_selector
@@ -2479,7 +2478,7 @@ class Grouping(NamedTuple, Generic[K, T]):
     values: Sequence[T]
 
 
-class GroupingSequence(SequenceTransform[Iterable[T], Grouping[K, T]]):
+class GroupingTransform(SequenceTransform[Iterable[T], Grouping[K, T]]):
     def __init__(self, iterable: Iterable[T], key_func: Callable[[T], K]) -> None:
         super().__init__(iterable)
         self._key_func = key_func
@@ -2504,7 +2503,7 @@ class GroupingSequence(SequenceTransform[Iterable[T], Grouping[K, T]]):
         yield from it(d.items()).map(lambda x: Grouping(x[0], it(x[1])))
 
 
-class CombinationSequence(SequenceTransform[Iterable[T], Tuple[T, ...]]):
+class CombinationTransform(SequenceTransform[Iterable[T], Tuple[T, ...]]):
     def __init__(self, iterable: Iterable[T], n: int) -> None:
         super().__init__(iterable)
         self._n = n
@@ -2514,7 +2513,7 @@ class CombinationSequence(SequenceTransform[Iterable[T], Tuple[T, ...]]):
         yield from combinations(self._iter, self._n)
 
 
-class WindowedSequence(SequenceTransform[Iterable[T], List[T]]):
+class WindowedTransform(SequenceTransform[Iterable[T], List[T]]):
     def __init__(self, iterable: Iterable[T], size: int, step: int, partialWindows :bool) -> None:
         super().__init__(iterable)
         self._size = size
@@ -2536,7 +2535,7 @@ class WindowedSequence(SequenceTransform[Iterable[T], List[T]]):
             yield list(window)
 
 
-class ConcatSequence(SequenceTransform[Iterable[Iterable[T]], T]):
+class ConcatTransform(SequenceTransform[Iterable[Iterable[T]], T]):
     def __init__(self, iterable: Iterable[Iterable[T]]) -> None:
         super().__init__(iterable)
     
@@ -2545,7 +2544,7 @@ class ConcatSequence(SequenceTransform[Iterable[Iterable[T]], T]):
             yield from i
 
 
-class ShufflingSequence(SequenceTransform[Iterable[T], T]):
+class ShufflingTransform(SequenceTransform[Iterable[T], T]):
     def __init__(self, iterable: Iterable[T], random: Optional[Union[Random, str, int]]=None) -> None:
         super().__init__(iterable)
         if random is None or isinstance(random, (str, int)):
@@ -2560,7 +2559,7 @@ class ShufflingSequence(SequenceTransform[Iterable[T], T]):
         yield from lst
 
 
-class ProgressSequence(SequenceTransform[Sequence[T], T]):
+class ProgressTransform(SequenceTransform[Sequence[T], T]):
     def __init__(self, iterable: Sequence[T], progress_func: Callable[[Iterable[T]], Iterable[T]]) -> None:
         super().__init__(iterable)
         self._progress_func = progress_func
