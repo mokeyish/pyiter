@@ -140,6 +140,11 @@ class Sequence(Generic[T], Iterable[T]):
         >>> lst = [{ 'name': 'A', 'age': 12}, { 'name': 'B', 'age': 13}]
         >>> it(lst).map(lambda x, i: x['name'] + str(i)).to_list()
         ['A0', 'B1']
+
+        Example 3:
+        >>> lst = ['hi', 'abc']
+        >>> it(lst).map(len).to_list()
+        [2, 3]
         """
         return MappingTransform(self, self._callback_overload_warpper(transform)).as_sequence()
     
@@ -2223,12 +2228,13 @@ class Sequence(Generic[T], Iterable[T]):
     def _callback_overload_warpper(self, callback: Callable[[T, int, Sequence[T]], R]) -> Callable[[T], R]:
         ...
     def _callback_overload_warpper(self, callback: Callable[..., R]) -> Callable[[T], R]:
-        if callback.__code__.co_argcount == 2:
-            index = AutoIncrementIndex()
-            return lambda x: callback(x, index()) 
-        if callback.__code__.co_argcount == 3:
-            index = AutoIncrementIndex()
-            return lambda x: callback(x, index(), self)
+        if hasattr(callback, '__code__'):
+            if callback.__code__.co_argcount == 2:
+                index = AutoIncrementIndex()
+                return lambda x: callback(x, index()) 
+            if callback.__code__.co_argcount == 3:
+                index = AutoIncrementIndex()
+                return lambda x: callback(x, index(), self)
         return callback
 
 
