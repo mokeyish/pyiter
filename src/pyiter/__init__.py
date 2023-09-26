@@ -3,6 +3,6 @@ PyIter is a Python package for iterative operations inspired by the Kotlin、CSh
 TypeSrcipt and Rust . Enables strong typing and type inference for iterative operations.
 """
 
-from .sequence import sequence, seq, iterate, it
+from .sequence import sequence, seq, iterate, it, Sequence
 
-__ALL__ = [sequence, seq, iterate, it]
+__ALL__ = [sequence, seq, iterate, it, Sequence] # type: ignore

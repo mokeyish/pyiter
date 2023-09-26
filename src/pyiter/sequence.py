@@ -2609,10 +2609,22 @@ class SequenceProducer:
         return Sequence(iterable) # type: ignore
     
     def json(self, filepath: str, **kwargs: Dict[str, Any]) -> Sequence[Any]:
+        """
+        Reads and parses the input of a json file.
+        """
         import json
         with open(filepath, 'r') as f:
             data = json.load(f, **kwargs) # type: ignore
             return self(data)
+    
+    def csv(self, filepath: str):
+        """
+        Reads and parses the input of a csv file.
+        """
+        import csv
+        with open(filepath) as f:
+            r = csv.reader(f)
+            return it(r)
 
 
 sequence = SequenceProducer()
