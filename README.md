@@ -40,7 +40,7 @@ it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).par
 
 
 **Type inference**
-![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/screenshot.png)
+![.](https://github.com/mokeyish/pyiter/raw/main/screenshots/screenshot.png)
 
 ## API
 
@@ -48,11 +48,11 @@ See [API](https://pyiter.yish.org/pyiter/sequence.html) documention.
 
 - You no need to read api documention. all api functions are listed by the code completion as follows.
   
-   ![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/apilist.png)
+   ![.](https://github.com/mokeyish/pyiter/raw/main/screenshots/apilist.png)
 
 - All documentions are showed as follows.
 
-   ![.](https://github.com/mokeyish/pyiter/raw/master/screenshots/apidoc.png)
+   ![.](https://github.com/mokeyish/pyiter/raw/main/screenshots/apidoc.png)
 
 ## Similar libraries
 
