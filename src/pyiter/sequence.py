@@ -2,7 +2,7 @@ from __future__ import annotations
 from deprecated import deprecated
 from typing import (
     overload, Any, List, Set, Dict, Deque, DefaultDict, Generic, Iterable, Iterator, Union, 
-    Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple,
+    Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple, Coroutine,
     TYPE_CHECKING
 )
 if TYPE_CHECKING:
@@ -151,6 +151,13 @@ class Sequence(Generic[T], Iterable[T]):
     @deprecated(reason="use `.map(lambda x, idx: ... )` instead.")
     def map_indexed(self, transform: Callable[[T, int], R]) -> Sequence[R]:
         return self.map(transform)
+    
+    async def map_async(self, transform: Callable[..., Coroutine[Any, Any, R]]) -> Sequence[R]:
+        """
+        Similar to `.map()` but you can input a async transform then await it.
+        """
+        from asyncio import gather
+        return it(await gather(*self.map(transform))) # type: ignore
 
     @overload
     def map_not_none(self, transform: Callable[[T], Optional[R]]) -> Sequence[R]:
@@ -285,16 +292,20 @@ class Sequence(Generic[T], Iterable[T]):
                 return e
         raise ValueError("Sequence is empty.")
     
+    
     @overload
-    def first_not_none_of(self, transform: Callable[[T], Optional[R]]) -> R:
+    def first_not_none_of(self: Sequence[Optional[R]]) -> R:
         ...
     @overload
-    def first_not_none_of(self, transform: Callable[[T, int], Optional[R]]) -> R:
+    def first_not_none_of(self: Sequence[Optional[R]], transform: Callable[[Optional[R]], Optional[R]]) -> R:
         ...
     @overload
-    def first_not_none_of(self, transform: Callable[[T, int, Sequence[T]], Optional[R]]) -> R:
+    def first_not_none_of(self: Sequence[Optional[R]], transform: Callable[[Optional[R], int], Optional[R]]) -> R:
         ...
-    def first_not_none_of(self, transform: Callable[..., Optional[R]]) -> R:
+    @overload
+    def first_not_none_of(self: Sequence[Optional[R]], transform: Callable[[Optional[R], int, Sequence[Optional[R]]], Optional[R]]) -> R:
+        ...
+    def first_not_none_of(self: Sequence[Optional[R]], transform: Optional[Callable[..., Optional[R]]] = None) -> R:
         """
         Returns the first non-`None` result of applying the given [transform] function to each element in the original collection.
 
@@ -310,21 +321,25 @@ class Sequence(Generic[T], Iterable[T]):
         ...
         ValueError: No element of the Sequence was transformed to a non-none value.
         """
-        v = self.first_not_none_of_or_none(transform)
+
+        v = self.first_not_none_of_or_none() if transform is None else self.first_not_none_of_or_none(transform)
         if v is None:
             raise ValueError('No element of the Sequence was transformed to a non-none value.')
         return v
     
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T], Optional[R]]) -> Optional[R]:
+    def first_not_none_of_or_none(self) -> T:
         ...
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T, int], Optional[R]]) -> Optional[R]:
+    def first_not_none_of_or_none(self, transform: Callable[[T], T]) -> T:
         ...
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T, int, Sequence[T]], Optional[R]]) -> Optional[R]:
+    def first_not_none_of_or_none(self, transform: Callable[[T, int], T]) -> T:
         ...
-    def first_not_none_of_or_none(self, transform: Callable[..., Optional[R]]) -> Optional[R]:
+    @overload
+    def first_not_none_of_or_none(self, transform: Callable[[T, int, Sequence[T]], T]) -> T:
+        ...
+    def first_not_none_of_or_none(self, transform: Optional[Callable[..., T]] = None) -> T:
         """
         Returns the first non-`None` result of applying the given [transform] function to each element in the original collection.
 
@@ -338,10 +353,12 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).first_not_none_of_or_none(lambda x: x['age']) is None
         True
         """
+        if transform is None:
+            return self.first_or_none()
         return self.map_not_none(transform).first_or_none()
 
     @overload
-    def first_or_none(self) -> Optional[T]:
+    def first_or_none(self) -> T:
         ...
     @overload
     def first_or_none(self, predicate: Callable[[T], bool]) -> Optional[T]:
@@ -2114,7 +2131,22 @@ class Sequence(Generic[T], Iterable[T]):
         >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
         return ProgressTransform(self, progress_func).as_sequence()
+    
+    def typing_as(self, typ: Type[R]) -> Sequence[R]:
+        """
+        Cast the element as specific Type to gain code completion base on type annotations.
+        """
+        el = self.first_not_none_of_or_none()
+        if el is None or isinstance(el, typ) or not isinstance(el, dict):
+            return self # type: ignore
 
+        class AttrDict(Dict[str, Any]):
+            def __init__(self, value: Dict[str, Any]) -> None:
+                super().__init__(**value)
+                setattr(self, '__dict__', value)
+                self.__getattr__  = value.__getitem__
+                self.__setattr__ = value.__setattr__ # type: ignore
+        return self.map(AttrDict) # type: ignore
 
     def to_set(self) -> Set[T]:
         """
@@ -2165,6 +2197,17 @@ class Sequence(Generic[T], Iterable[T]):
         ['b', 'c', 'a']
         """
         return list(self)
+    
+    async def to_list_async(self: Iterable[Coroutine[Any, Any, T]]) -> List[T]:
+        """
+        Returns a list with elements of the given Sequence.
+
+        Example 1:
+        >>> it(['b', 'c', 'a']).to_list()
+        ['b', 'c', 'a']
+        """
+        from asyncio import gather
+        return await gather(*self) # type: ignore
     
     def let(self, block: Callable[[Sequence[T]], R]) -> R:
         """
