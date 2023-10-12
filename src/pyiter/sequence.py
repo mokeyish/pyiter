@@ -2146,7 +2146,7 @@ class Sequence(Generic[T], Iterable[T]):
                 setattr(self, '__dict__', value)
                 self.__getattr__  = value.__getitem__
                 self.__setattr__ = value.__setattr__ # type: ignore
-        return self.map(AttrDict) # type: ignore
+        return self.map(AttrDict) # type: ignore  # use https://github.com/cdgriffith/Box ?
 
     def to_set(self) -> Set[T]:
         """
