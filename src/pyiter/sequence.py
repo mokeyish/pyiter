@@ -1807,7 +1807,7 @@ class Sequence(Generic[T], Iterable[T]):
         ['a__1', 'b__2', 'c__3']
         """
         if transform is None:
-            transform = lambda a, b:(a, b)
+            transform = lambda *x:(*x,)
         return MergingTransform(self, other, transform).as_sequence()
     
     @overload
@@ -2106,6 +2106,66 @@ class Sequence(Generic[T], Iterable[T]):
         ['a', 'b', 'c', 1, 2, 3, 4, 5, 6]
         """
         return ConcatTransform([self, *other]).as_sequence()
+    
+    def intersect(self, *other: Sequence[T]) -> Sequence[T]:
+        """
+        Returns a set containing all elements that are contained by both this collection and the specified collection.
+
+        The returned set preserves the element iteration order of the original collection.
+
+        To get a set containing all elements that are contained at least in one of these collections use union.
+
+        Example 1:
+        >>> lst1 = ['a', 'b', 'c']
+        >>> lst2 = ['a2', 'b2', 'c']
+        >>> it(lst1).intersect(lst2).to_list()
+        ['c']
+
+        Example 2:
+        >>> lst1 = ['a', 'b', 'c']
+        >>> lst2 = ['a2', 'b', 'c']
+        >>> lst3 = ['a3', 'b', 'c3']
+        >>> it(lst1).intersect(lst2, lst3).to_list()
+        ['b']
+
+
+        Example 1:
+        >>> lst1 = ['a', 'a', 'c']
+        >>> lst2 = ['a2', 'b2', 'a']
+        >>> it(lst1).intersect(lst2).to_list()
+        ['a']
+        """
+        return IntersectionTransform([self, *other]).as_sequence()
+    
+    def union(self, *other: Sequence[T]) -> Sequence[T]:
+        """
+        Returns a set containing all distinct elements from both collections.
+
+        The returned set preserves the element iteration order of the original collection. Those elements of the other collection that are unique are iterated in the end in the order of the other collection.
+
+        To get a set containing all elements that are contained in both collections use intersect.
+
+        Example 1:
+        >>> lst1 = ['a', 'b', 'c']
+        >>> lst2 = ['a2', 'b2', 'c']
+        >>> it(lst1).union(lst2).to_list()
+        ['a', 'b', 'c', 'a2', 'b2']
+
+        Example 2:
+        >>> lst1 = ['a', 'b', 'c']
+        >>> lst2 = ['a2', 'b', 'c']
+        >>> lst3 = ['a3', 'b', 'c3']
+        >>> it(lst1).union(lst2, lst3).to_list()
+        ['a', 'b', 'c', 'a2', 'a3', 'c3']
+
+
+        Example 1:
+        >>> lst1 = ['a', 'a', 'c']
+        >>> lst2 = ['a2', 'b2', 'a']
+        >>> it(lst1).union(lst2).to_list()
+        ['a', 'c', 'a2', 'b2']
+        """
+        return self.concat(*other).distinct()
     
 
     def join(self: Sequence[str], separator: str = ' ') -> str:
@@ -2487,6 +2547,19 @@ class MergingTransform(SequenceTransform[Iterable[T], V]):
                 yield self._transformer(next(iter1), next(iter2))
             except StopIteration:
                 break
+
+
+class IntersectionTransform(SequenceTransform[Iterable[Iterable[T]], T]):
+    def __init__(self, iterable: Iterable[Iterable[T]]) -> None:
+        super().__init__(iterable)
+    
+    def __do_iter__(self) -> Iterator[T]:
+        iters = it(self._iter)
+        seen: Set[T] = set()
+        for v in iters.first():
+            if v not in seen and iters.all(lambda iter: v in iter):
+                yield v
+                seen.add(v)
 
 
 class MergingWithNextTransform(SequenceTransform[Iterable[T], V]):
