@@ -2720,8 +2720,12 @@ class SequenceProducer:
     def __call__(self, *elements: T) -> Sequence[T]:
         ...
     def __call__(self, *iterable: Union[Iterable[T], List[T], T]) -> Sequence[T]: # type: ignore
-        if len(iterable) == 1 and isinstance(iterable[0], Iterable) and not isinstance(iterable[0], str):
-            return Sequence(iterable[0]) # type: ignore
+        if len(iterable) == 1:
+            iter = iterable[0]
+            if isinstance(iter, Sequence):
+                return iter # type: ignore
+            if isinstance(iter, Iterable) and not isinstance(iter, str):
+                return Sequence(iter) # type: ignore
         return Sequence(iterable) # type: ignore
     
     def json(self, filepath: str, **kwargs: Dict[str, Any]) -> Sequence[Any]:
