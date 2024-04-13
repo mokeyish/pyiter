@@ -19,7 +19,7 @@ pip install pyiter
 ## Quickstart
 
 ```python
-from pyiter import iterate as it
+from pyiter import it
 from tqdm import tqdm
 
 

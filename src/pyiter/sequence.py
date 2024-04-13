@@ -2179,8 +2179,16 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return separator.join(self)
     
-
+    @overload
+    def progress(self) -> Sequence[T]:
+        ...
+    @overload
+    def progress(self, progress_func: Union[Literal['tqdm'], Literal['tqdm_rich']]) -> Sequence[T]:
+        ...
+    @overload
     def progress(self, progress_func: Callable[[Iterable[T]], Iterable[T]]) -> Sequence[T]:
+        ...
+    def progress(self, progress_func: Union[Callable[[Iterable[T]], Iterable[T]], Literal['tqdm'], Literal['tqdm_rich'], None ] = None) -> Sequence[T]:
         """
         Returns a Sequence that enable a progress bar for the given Sequence.
         
@@ -2190,7 +2198,25 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(range(10)).progress(lambda x: tqdm(x, total=len(x))).parallel_map(lambda x: sleep(0.), max_workers=5).to_list() and None
         >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
-        return ProgressTransform(self, progress_func).as_sequence()
+        if progress_func is not None and callable(progress_func):
+            return ProgressTransform(self, progress_func).as_sequence()
+        
+        def import_tqdm():
+            if progress_func == 'tqdm_rich':
+                from tqdm.rich import tqdm
+            else:
+                from tqdm import tqdm
+            return tqdm
+
+        try:
+            tqdm = import_tqdm()
+        except ImportError:
+            from pip import main as pip
+            pip(['install', 'tqdm'])
+            tqdm = import_tqdm()
+        
+        return it(tqdm(self, total=len(self)))
+        
     
     def typing_as(self, typ: Type[R]) -> Sequence[R]:
         """
@@ -2434,7 +2460,7 @@ class ParallelMappingTransform(SequenceTransform[Sequence[T], R]):
     def __do_iter__(self) -> Iterator[R]:
         import os
 
-        def create_executor(max_workers: int, ):
+        def create_executor(max_workers: int):
             if self._executor == 'Process':
                 from concurrent.futures import ProcessPoolExecutor
                 return ProcessPoolExecutor(max_workers=max_workers)
@@ -2442,21 +2468,14 @@ class ParallelMappingTransform(SequenceTransform[Sequence[T], R]):
                 from concurrent.futures import ThreadPoolExecutor
                 return ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='PyIter worker')
 
-        size = len(self._iter)
         chunksize = self._chunksize
         max_workers = self._max_workers or min(32, (os.cpu_count() or 1) + 4)
-        batch_count = -1 * (-size // chunksize)
-        max_workers = min(max_workers, batch_count)
-
         batch_size = max_workers * chunksize
-
-        if batch_size < size:
-            for batch in it(self._iter).chunked(batch_size):
-                with create_executor(max_workers) as executor:
-                    yield from executor.map(self._transformer, batch, chunksize=chunksize)
-        else:
+        
+        for batch in self._iter.chunked(batch_size):
             with create_executor(max_workers) as executor:
-                yield from executor.map(self._transformer, self._iter, chunksize=chunksize)
+                yield from executor.map(self._transformer, batch, chunksize=chunksize)
+
 
 
 class IndexedValue(NamedTuple, Generic[T]):

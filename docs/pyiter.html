@@ -50,20 +50,52 @@ pyiter    </h1>
 
                         <div class="docstring"><p>PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、
 TypeSrcipt and Rust . Enables strong typing and type inference for iterative operations.</p>
+
+<p>Example:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyiter</span> <span class="kn">import</span> <span class="n">iterate</span> <span class="k">as</span> <span class="n">it</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+</code></pre>
+</div>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</code></pre>
+</div>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># use tqdm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">progress</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">len</span><span class="p">))</span><span class="o">.</span><span class="n">parallel_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</code></pre>
+</div>
 </div>
 
                         <input id="mod-pyiter-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-pyiter-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">TypeSrcipt and Rust . Enables strong typing and type inference for iterative operations.</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">6</span></a><span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">iterate</span><span class="p">,</span> <span class="n">it</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a><span class="n">__ALL__</span> <span class="o">=</span> <span class="p">[</span><span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">iterate</span><span class="p">,</span> <span class="n">it</span><span class="p">]</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">TypeSrcipt and Rust . Enables strong typing and type inference for iterative operations.</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">Example:</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">&gt;&gt;&gt; from pyiter import iterate as it</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&gt;&gt;&gt; from tqdm import tqdm</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">&gt;&gt;&gt; text = [&quot;hello&quot;, &quot;world&quot;]</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">&gt;&gt;&gt; it(text).map(str.upper).to_list()</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">&gt;&gt;&gt; # use tqdm</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">&gt;&gt;&gt; it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">iterate</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">Sequence</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">__ALL__</span> <span class="o">=</span> <span class="p">[</span><span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">iterate</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">]</span> <span class="c1"># type: ignore</span>
 </span></pre></div>
 
 
