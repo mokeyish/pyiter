@@ -502,6 +502,24 @@ class Sequence(Generic[T], Iterable[T]):
             last = i
         return last
     
+    def index_of_or_none(self, element: T) -> Optional[int]:
+        """
+        Returns first index of [element], or None if the collection does not contain element.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or_none('b')
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or_none('d')
+        """
+        for i, x in enumerate(self._iter):
+            if x == element:
+                return i
+        return None
+
     def index_of(self, element: T) -> int:
         """
         Returns first index of [element], or -1 if the collection does not contain element.
@@ -516,15 +534,32 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).index_of('d')
         -1
         """
-        for i, x in enumerate(self._iter):
-            if x == element:
-                return i
-        return -1
+        return self.index_of_or_none(element) or -1
     
+    def last_index_of_or_none(self, element: T) -> Optional[int]:
+        """
+         Returns last index of [element], or None if the collection does not contain element.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).last_index_of_or_none('b')
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).last_index_of_or_none('d')
+        """
+        seq = self.reversed()
+        last_idx = len(seq) - 1;
+        for i, x in enumerate(seq):
+            if x == element:
+                return last_idx - i
+        return None
+
     def last_index_of(self, element: T) -> int:
         """
          Returns last index of [element], or -1 if the collection does not contain element.
-         
+
         Example 1:
         >>> lst = ['a', 'b', 'c', 'b']
         >>> it(lst).last_index_of('b')
@@ -535,13 +570,36 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).last_index_of('d')
         -1
         """
-        seq = self.reversed()
-        last_idx = len(seq) - 1;
-        for i, x in enumerate(seq):
-            if x == element:
-                return last_idx - i
-        return -1
-    
+        return self.last_index_of_or_none(element) or -1
+
+    @overload
+    def index_of_first_or_none(self, predicate: Callable[[T], bool]) -> Optional[int]:
+        ...
+    @overload
+    def index_of_first_or_none(self, predicate: Callable[[T, int], bool]) -> Optional[int]:
+        ...
+    @overload
+    def index_of_first_or_none(self, predicate: Callable[[T, int, Sequence[T]], bool]) -> Optional[int]:
+        ...
+    def index_of_first_or_none(self, predicate: Callable[..., bool]) -> Optional[int]:
+        """
+        Returns first index of element matching the given [predicate], or None if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or_none(lambda x: x == 'b')
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or_none(lambda x: x == 'd')
+        """
+        predicate = self._callback_overload_warpper(predicate)
+        for i, x in enumerate(self._iter):
+            if predicate(x):
+                return i
+        return None
+
     @overload
     def index_of_first(self, predicate: Callable[[T], bool]) -> int:
         ...
@@ -554,7 +612,7 @@ class Sequence(Generic[T], Iterable[T]):
     def index_of_first(self, predicate: Callable[..., bool]) -> int:
         """
         Returns first index of element matching the given [predicate], or -1 if no such element was found.
-         
+
         Example 1:
         >>> lst = ['a', 'b', 'c']
         >>> it(lst).index_of_first(lambda x: x == 'b')
@@ -565,12 +623,38 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).index_of_first(lambda x: x == 'd')
         -1
         """
+        return self.index_of_first_or_none(predicate) or -1
+
+    @overload
+    def index_of_last_or_none(self, predicate: Callable[[T], bool]) -> Optional[int]:
+        ...
+    @overload
+    def index_of_last_or_none(self, predicate: Callable[[T, int], bool]) -> Optional[int]:
+        ...
+    @overload
+    def index_of_last_or_none(self, predicate: Callable[[T, int, Sequence[T]], bool]) -> Optional[int]:
+        ...
+    def index_of_last_or_none(self, predicate: Callable[..., bool]) -> Optional[int]:
+        """
+        Returns last index of element matching the given [predicate], or -1 if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).index_of_last_or_none(lambda x: x == 'b')
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last_or_none(lambda x: x == 'd')
+        """
+        seq = self.reversed()
+        last_idx = len(seq) - 1
         predicate = self._callback_overload_warpper(predicate)
-        for i, x in enumerate(self._iter):
+        for i, x in enumerate(seq):
             if predicate(x):
-                return i
-        return -1
-    
+                return last_idx - i
+        return None
+
     @overload
     def index_of_last(self, predicate: Callable[[T], bool]) -> int:
         ...
@@ -583,7 +667,7 @@ class Sequence(Generic[T], Iterable[T]):
     def index_of_last(self, predicate: Callable[..., bool]) -> int:
         """
         Returns last index of element matching the given [predicate], or -1 if no such element was found.
-         
+
         Example 1:
         >>> lst = ['a', 'b', 'c', 'b']
         >>> it(lst).index_of_last(lambda x: x == 'b')
@@ -594,13 +678,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).index_of_last(lambda x: x == 'd')
         -1
         """
-        seq = self.reversed()
-        last_idx = len(seq) - 1;
-        predicate = self._callback_overload_warpper(predicate)
-        for i, x in enumerate(seq):
-            if predicate(x):
-                return last_idx - i
-        return -1
+        return self.index_of_last_or_none(predicate) or -1
 
     @overload
     def single(self) -> T:
