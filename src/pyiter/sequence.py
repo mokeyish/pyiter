@@ -106,7 +106,7 @@ class Sequence(Generic[T], Iterable[T]):
         predicate = self._callback_overload_warpper(predicate)
         return self.filter(lambda x: not predicate(x))
 
-    def filter_not_none(self) -> Sequence[T]:
+    def filter_not_none(self: Sequence[Optional[R]]) -> Sequence[R]:
         """
         Returns a Sequence containing all elements that are not `None`.
 
@@ -115,7 +115,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).filter_not_none().to_list()
         ['a', 'b']
         """
-        return self.filter(lambda x: x is not None)
+        return self.filter(lambda x: x is not None) # type: ignore
     
     @overload
     def map(self, transform: Callable[[T], R]) -> Sequence[R]:
