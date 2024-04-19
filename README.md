@@ -46,7 +46,7 @@ it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).par
 
 See [API](https://pyiter.yish.org/pyiter/sequence.html) documention.
 
-- You no need to read api documention. all api functions are listed by the code completion as follows.
+- You no need to read API documention. all functions are listed by the code completion as follows.
   
    ![.](https://github.com/mokeyish/pyiter/raw/main/screenshots/apilist.png)
 

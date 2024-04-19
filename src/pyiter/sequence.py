@@ -36,9 +36,7 @@ class Sequence(Generic[T], Iterable[T]):
 
     def __init__(self, iterable: Iterable[T]) -> None:
         super().__init__()
-        if not isinstance(isinstance, SequenceTransform):
-            iterable = SequenceTransform(iterable)
-        self._iter = iterable
+        self._iter = SequenceTransform(iterable)
 
     @overload
     def filter(self, predicate: Callable[[T], bool]) -> Sequence[T]:
@@ -80,6 +78,7 @@ class Sequence(Generic[T], Iterable[T]):
 
         """
         return self.filter(lambda x: isinstance(x, typ)) # type: ignore
+
     @overload
     def filter_not(self, predicate: Callable[[T], bool]) -> Sequence[T]:
         ...
@@ -291,8 +290,7 @@ class Sequence(Generic[T], Iterable[T]):
             if predicate is None or predicate(e):
                 return e
         raise ValueError("Sequence is empty.")
-    
-    
+
     @overload
     def first_not_none_of(self: Sequence[Optional[R]]) -> R:
         ...
@@ -428,10 +426,10 @@ class Sequence(Generic[T], Iterable[T]):
         'd'
         """
         if isinstance(predicate, Callable):
-            return self.first_or_none(predicate) or default # type: ignore
+            return none_or(self.first_or_none(predicate), default) # type: ignore
         else:
             default = predicate
-        return self.first_or_none() or default
+        return none_or(self.first_or_none(), default)
 
     @overload
     def last(self) -> T:
@@ -534,7 +532,39 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).index_of('d')
         -1
         """
-        return self.index_of_or_none(element) or -1
+        return none_or(self.index_of_or_none(element), -1)
+    
+    def index_of_or(self, element: T, default: int) -> int:
+        """
+        Returns first index of [element], or default value if the collection does not contain element.
+         
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or('b', 1)
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or('d', 0)
+        0
+        """
+        return none_or(self.index_of_or_none(element), default)
+    
+    def index_of_or_else(self, element: T, f: Callable[[], int]) -> int:
+        """
+        Returns first index of [element], or computes the value from a callback if the collection does not contain element.
+         
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or_else('b', lambda: 2)
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_or_else('d', lambda: 0)
+        0
+        """
+        return none_or_else(self.index_of_or_none(element), f)
     
     def last_index_of_or_none(self, element: T) -> Optional[int]:
         """
@@ -550,7 +580,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).last_index_of_or_none('d')
         """
         seq = self.reversed()
-        last_idx = len(seq) - 1;
+        last_idx = len(seq) - 1
         for i, x in enumerate(seq):
             if x == element:
                 return last_idx - i
@@ -570,7 +600,39 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).last_index_of('d')
         -1
         """
-        return self.last_index_of_or_none(element) or -1
+        return none_or(self.last_index_of_or_none(element), -1)
+    
+    def last_index_of_or(self, element: T, default: int) -> int:
+        """
+         Returns last index of [element], or default value if the collection does not contain element.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).last_index_of_or('b', 0)
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).last_index_of_or('d', len(lst))
+        3
+        """
+        return none_or(self.last_index_of_or_none(element), default)
+    
+    def last_index_of_or_else(self, element: T, f: Callable[[], int]) -> int:
+        """
+         Returns last index of [element], or computes the value from a callback if the collection does not contain element.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).last_index_of_or_else('b', lambda: 0)
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).last_index_of_or_else('d', lambda: len(lst))
+        3
+        """
+        return none_or_else(self.last_index_of_or_none(element), f)
 
     @overload
     def index_of_first_or_none(self, predicate: Callable[[T], bool]) -> Optional[int]:
@@ -622,8 +684,73 @@ class Sequence(Generic[T], Iterable[T]):
         >>> lst = ['a', 'b', 'c']
         >>> it(lst).index_of_first(lambda x: x == 'd')
         -1
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first(lambda x: x == 'a')
+        0
         """
-        return self.index_of_first_or_none(predicate) or -1
+        return none_or(self.index_of_first_or_none(predicate), -1)
+    
+    @overload
+    def index_of_first_or(self, predicate: Callable[[T], bool], default: int) -> int:
+        ...
+    @overload
+    def index_of_first_or(self, predicate: Callable[[T, int], bool], default: int) -> int:
+        ...
+    @overload
+    def index_of_first_or(self, predicate: Callable[[T, int, Sequence[T]], bool], default: int) -> int:
+        ...
+    def index_of_first_or(self, predicate: Callable[..., bool], default: int) -> int:
+        """
+        Returns first index of element matching the given [predicate], or default value if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or(lambda x: x == 'b', 0)
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or(lambda x: x == 'd', 0)
+        0
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or(lambda x: x == 'a', 0)
+        0
+        """
+        return none_or(self.index_of_first_or_none(predicate), default)
+    
+    @overload
+    def index_of_first_or_else(self, predicate: Callable[[T], bool], f: Callable[[], int]) -> int:
+        ...
+    @overload
+    def index_of_first_or_else(self, predicate: Callable[[T, int], bool], f: Callable[[], int]) -> int:
+        ...
+    @overload
+    def index_of_first_or_else(self, predicate: Callable[[T, int, Sequence[T]], bool], f: Callable[[], int]) -> int:
+        ...
+    def index_of_first_or_else(self, predicate: Callable[..., bool], f: Callable[[], int]) -> int:
+        """
+        Returns first index of element matching the given [predicate], or computes the value from a callback if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or_else(lambda x: x == 'b', lambda: len(lst))
+        1
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or_else(lambda x: x == 'd', lambda: len(lst))
+        3
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_first_or_else(lambda x: x == 'a', lambda: len(lst))
+        0
+        """
+        return none_or_else(self.index_of_first_or_none(predicate), f)
 
     @overload
     def index_of_last_or_none(self, predicate: Callable[[T], bool]) -> Optional[int]:
@@ -677,8 +804,73 @@ class Sequence(Generic[T], Iterable[T]):
         >>> lst = ['a', 'b', 'c']
         >>> it(lst).index_of_last(lambda x: x == 'd')
         -1
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last(lambda x: x == 'a')
+        0
         """
-        return self.index_of_last_or_none(predicate) or -1
+        return none_or(self.index_of_last_or_none(predicate), -1)
+    
+    @overload
+    def index_of_last_or(self, predicate: Callable[[T], bool], default: int) -> int:
+        ...
+    @overload
+    def index_of_last_or(self, predicate: Callable[[T, int], bool], default: int) -> int:
+        ...
+    @overload
+    def index_of_last_or(self, predicate: Callable[[T, int, Sequence[T]], bool], default: int) -> int:
+        ...
+    def index_of_last_or(self, predicate: Callable[..., bool], default: int) -> int:
+        """
+        Returns last index of element matching the given [predicate], or default value if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).index_of_last_or(lambda x: x == 'b', 0)
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last_or(lambda x: x == 'd', -99)
+        -99
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last_or(lambda x: x == 'a', 0)
+        0
+        """
+        return none_or(self.index_of_last_or_none(predicate), default)
+    
+    @overload
+    def index_of_last_o_else(self, predicate: Callable[[T], bool], f: Callable[[], int]) -> int:
+        ...
+    @overload
+    def index_of_last_o_else(self, predicate: Callable[[T, int], bool], f: Callable[[], int]) -> int:
+        ...
+    @overload
+    def index_of_last_o_else(self, predicate: Callable[[T, int, Sequence[T]], bool], f: Callable[[], int]) -> int:
+        ...
+    def index_of_last_o_else(self, predicate: Callable[..., bool], f: Callable[[], int]) -> int:
+        """
+        Returns last index of element matching the given [predicate], or default value if no such element was found.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c', 'b']
+        >>> it(lst).index_of_last_o_else(lambda x: x == 'b', lambda: -len(lst))
+        3
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last_o_else(lambda x: x == 'd', lambda: -len(lst))
+        -3
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).index_of_last_o_else(lambda x: x == 'a', lambda: -len(lst))
+        0
+        """
+        return none_or_else(self.index_of_last_or_none(predicate), f)
 
     @overload
     def single(self) -> T:
@@ -751,13 +943,12 @@ class Sequence(Generic[T], Iterable[T]):
 
         Exmaple 2:
         >>> lst = []
-        >>> it(lst).single_or_none() is None
-        True
+        >>> it(lst).single_or_none()
 
         Exmaple 2:
         >>> lst = ['a', 'b']
-        >>> it(lst).single_or_none() is None
-        True
+        >>> it(lst).single_or_none()
+
         """
         single: Optional[T] = None
         found = False
@@ -1256,6 +1447,8 @@ class Sequence(Generic[T], Iterable[T]):
         if (index < 0):
             return default(index) if callable(default) else default
         
+        if type(self._iter) == SequenceTransform and isinstance(self._iter._iter, list) and index < len(self._iter._iter): # type: ignore
+            return self._iter._iter[index] # type: ignore
         for i, e in enumerate(self):
             if i == index:
                 return e
@@ -2350,7 +2543,7 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).to_dict()
         {1: '1', 2: '2', 3: '3'}
         """
-        return self.associate(transform or (lambda x: x))
+        return self.associate(transform or (lambda x: x)) # type: ignore
 
     def to_list(self) -> List[T]:
         """
@@ -2424,6 +2617,24 @@ class Sequence(Generic[T], Iterable[T]):
 
     def __len__(self):
         return len(self._iter)
+
+    def __getitem__(self, key: int):
+        """
+        Returns the element at the specified [index] in the Sequence.
+
+        Example 1:
+        >>> lst = [1, 2, 3]
+        >>> it(lst)[1]
+        2
+
+        Example 2:
+        >>> lst = [1, 2, 3]
+        >>> it(lst)[3]
+        Traceback (most recent call last):
+        ...
+        IndexError: Index 3 out of range
+        """
+        return self.element_at(key)
 
     @overload
     def _callback_overload_warpper(self, callback: Callable[[T], R]) -> Callable[[T], R]:
@@ -2805,6 +3016,12 @@ class ProgressTransform(SequenceTransform[Sequence[T], T]):
 def throw(exception: Exception) -> Any:
     raise exception
 
+
+def none_or(value: Optional[T], default: T) -> T:
+    return value if value is not None else default
+
+def none_or_else(value: Optional[T], f: Callable[[], T]) -> T:
+    return value if value is not None else f()
 
 class SequenceProducer:
     @overload
