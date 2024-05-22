@@ -105,6 +105,12 @@ class Sequence(Generic[T], Iterable[T]):
         predicate = self._callback_overload_warpper(predicate)
         return self.filter(lambda x: not predicate(x))
 
+    @overload
+    def filter_not_none(self: Sequence[Optional[R]]) -> Sequence[R]:
+        ...
+    @overload
+    def filter_not_none(self: Sequence[T]) -> Sequence[T]:
+        ...
     def filter_not_none(self: Sequence[Optional[R]]) -> Sequence[R]:
         """
         Returns a Sequence containing all elements that are not `None`.
@@ -2618,6 +2624,9 @@ class Sequence(Generic[T], Iterable[T]):
     def __len__(self):
         return len(self._iter)
 
+    def __repr__(self):
+        return repr(self.to_list())
+
     def __getitem__(self, key: int):
         """
         Returns the element at the specified [index] in the Sequence.
@@ -3055,10 +3064,35 @@ class SequenceProducer:
         """
         Reads and parses the input of a csv file.
         """
+        return self.read_csv(filepath)
+
+    def read_csv(self, filepath: str, header: Optional[int]=0):
+        """
+        Reads and parses the input of a csv file.
+
+        Example 1:
+        >>> it.read_csv('tests/data/a.csv')
+        [{'a': 'a1', 'b': '1'}, {'a': 'a2', 'b': '2'}]
+        """
         import csv
+        it = self
         with open(filepath) as f:
-            r = csv.reader(f)
-            return it(r)
+            reader = csv.reader(f)
+            iter = it(*reader)
+            if header is None or header < 0:
+                return iter
+
+            headers = iter.element_at_or_none(header)
+            if headers is not None:
+                if header == 0:
+                    iter = iter.skip(1)
+                else:
+                    iter = iter.filter(lambda _, i: i != header)
+
+                return iter.map(lambda row: it(row).associate_by(
+                    lambda _, ordinal: headers[ordinal] if ordinal < len(headers) else f'undefined_{ordinal}')
+                )
+            return iter
 
 
 sequence = SequenceProducer()
