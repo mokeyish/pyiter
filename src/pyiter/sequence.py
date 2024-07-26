@@ -2,7 +2,7 @@ from __future__ import annotations
 from deprecated import deprecated
 from typing import (
     overload, Any, List, Set, Dict, Deque, DefaultDict, Generic, Iterable, Iterator, Union, 
-    Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple, Coroutine,
+    Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple, Awaitable,
     TYPE_CHECKING
 )
 if TYPE_CHECKING:
@@ -157,12 +157,24 @@ class Sequence(Generic[T], Iterable[T]):
     def map_indexed(self, transform: Callable[[T, int], R]) -> Sequence[R]:
         return self.map(transform)
     
-    async def map_async(self, transform: Callable[..., Coroutine[Any, Any, R]]) -> Sequence[R]:
+
+    @overload
+    async def map_async(self, transform: Callable[[T], Awaitable[R]]) -> Sequence[R]:
+        ...
+    @overload
+    async def map_async(self, transform: Callable[[T, int], Awaitable[R]], return_exceptions: Literal[True]) -> Sequence[Union[R, BaseException]]:
+        ...
+    @overload
+    async def map_async(self, transform: Callable[[T, int, Sequence[T]], Awaitable[R]], return_exceptions: Literal[False] = False) -> Sequence[R]:
+        ...
+    async def map_async(self, transform: Callable[..., Awaitable[R]], return_exceptions: bool = False):
         """
         Similar to `.map()` but you can input a async transform then await it.
         """
         from asyncio import gather
-        return it(await gather(*self.map(transform))) # type: ignore
+        if return_exceptions:
+            return it(await gather(*self.map(transform), return_exceptions=True))
+        return it(await gather(*self.map(transform)))
 
     @overload
     def map_not_none(self, transform: Callable[[T], Optional[R]]) -> Sequence[R]:
@@ -2561,7 +2573,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return list(self)
     
-    async def to_list_async(self: Iterable[Coroutine[Any, Any, T]]) -> List[T]:
+    async def to_list_async(self: Iterable[Awaitable[T]]) -> List[T]:
         """
         Returns a list with elements of the given Sequence.
 
@@ -2712,7 +2724,7 @@ class SequenceTransform(Generic[IterableS, T], Iterable[T]):
         if cache is not None:
             return len(cache)
         return 0
-    
+
     def as_sequence(self) -> Sequence[T]:
         return it(self)
 
@@ -2779,7 +2791,7 @@ class ParallelMappingTransform(SequenceTransform[Sequence[T], R]):
 class IndexedValue(NamedTuple, Generic[T]):
     val: T
     idx: int
-    
+
     def __repr__(self) -> str:
         return f'IndexedValue({self.idx}, {self.val})'
 
