@@ -19,6 +19,6 @@ setup(
     license='MIT',
     python_requires='>=3.8',
     install_requires = [
-        'Deprecated'
+        'typing_extensions'
     ]
 )

@@ -1,16 +1,18 @@
 from __future__ import annotations
-from deprecated import deprecated
 from typing import (
     overload, Any, List, Set, Dict, Deque, DefaultDict, Generic, Iterable, Iterator, Union, 
     Optional, Tuple, Type, TypeVar, Callable, Literal, NamedTuple, Awaitable,
     TYPE_CHECKING
 )
+
+from typing_extensions import deprecated
+
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparisonT
     from random import Random
 
 import sys
-if sys.version_info.major == 3 and sys.version_info.minor < 11:
+if sys.version_info < (3, 11):
     # Generic NamedTuple
     origin__namedtuple_mro_entries =  NamedTuple.__mro_entries__ # type: ignore
     NamedTuple.__mro_entries__ = lambda bases: origin__namedtuple_mro_entries(bases[:1]) # type: ignore
@@ -63,7 +65,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return FilteringTransform(self, self._callback_overload_warpper(predicate)).as_sequence()
 
-    @deprecated(reason="use `.filter(lambda x, idx: ... )` instead.")
+    @deprecated("use `.filter(lambda x, idx: ... )` instead.", category=None)
     def filter_indexed(self, predicate: Callable[[T, int], bool]) -> Sequence[T]:
         return self.filter(predicate)
 
@@ -153,7 +155,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         return MappingTransform(self, self._callback_overload_warpper(transform)).as_sequence()
     
-    @deprecated(reason="use `.map(lambda x, idx: ... )` instead.")
+    @deprecated("use `.map(lambda x, idx: ... )` instead.", category=None)
     def map_indexed(self, transform: Callable[[T, int], R]) -> Sequence[R]:
         return self.map(transform)
     
@@ -2000,7 +2002,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         self.parallel_on_each(action, max_workers)
     
-    @deprecated(reason="use `.for_each(lambda x, idx: ... )` instead.")
+    @deprecated("use `.for_each(lambda x, idx: ... )` instead.", category=None)
     def foreach_indexed(self, action: Callable[[T, int], None]) -> None:
         self.on_each(action)
     
@@ -2069,7 +2071,7 @@ class Sequence(Generic[T], Iterable[T]):
         return self
     
 
-    @deprecated(reason="use `.on_each(lambda x, idx: ... )` instead.")
+    @deprecated("use `.on_each(lambda x, idx: ... )` instead.", category=None)
     def on_each_indexed(self, action: Callable[[T, int], None]) -> Sequence[T]:
         return self.on_each(action)
     
@@ -2283,7 +2285,7 @@ class Sequence(Generic[T], Iterable[T]):
     @overload
     def partition_indexed(self, predicate: Callable[[T, int], bool], as_sequence: Literal[True]) -> Tuple[Sequence[T], Sequence[T]]:
         ...
-    @deprecated(reason="use `.partition(lambda x, idx: ... )` instead.")
+    @deprecated("use `.partition(lambda x, idx: ... )` instead.", category=None)
     def partition_indexed(self, predicate: Callable[[T, int], bool], as_sequence: bool=False) -> Any:
         return self.partition(predicate, as_sequence) # type: ignore
     
@@ -2626,6 +2628,12 @@ class Sequence(Generic[T], Iterable[T]):
         2
         """
         return len(self)
+    
+    def is_empty(self) -> bool:
+        """
+        Returns True if the Sequence is empty, False otherwise.
+        """
+        return len(self) == 0
     
     def __iter__(self) -> Iterator[T]:
         return self.__do_iter()
