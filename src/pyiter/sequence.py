@@ -40,6 +40,76 @@ class Sequence(Generic[T], Iterable[T]):
         super().__init__()
         self._iter = SequenceTransform(iterable)
 
+    def dedup(self) -> Sequence[T]:
+        """
+        Removes consecutive repeated elements in the sequence.
+
+        If the sequence is sorted, this removes all duplicates.
+
+        Example 1:
+        >>> lst = [ 'a1', 'a1', 'b2', 'a2', 'a1']
+        >>> it(lst).dedup().to_list()
+        ['a1', 'b2', 'a2', 'a1']
+
+        Example 1:
+        >>> lst = [ 'a1', 'a1', 'b2', 'a2', 'a1']
+        >>> it(lst).sorted().dedup().to_list()
+        ['a1', 'a2', 'b2']
+        """
+        return self.dedup_by(lambda x: x)
+
+    @overload
+    def dedup_by(self, key_selector: Callable[[T], Any]) -> Sequence[T]:
+        ...
+    @overload
+    def dedup_by(self, key_selector: Callable[[T, int], Any]) -> Sequence[T]:
+        ...
+    @overload
+    def dedup_by(self, key_selector: Callable[[T, int, Sequence[T]], Any]) -> Sequence[T]:
+        ...
+    def dedup_by(self, key_selector: Callable[..., Any]) -> Sequence[T]:
+        """
+        Removes all but the first of consecutive elements in the sequence that resolve to the same key.
+        """
+        return self.dedup_into_group_by(key_selector).map(lambda x: x[0])
+
+    @overload
+    def dedup_with_count_by(self, key_selector: Callable[[T], Any]) -> Sequence[Tuple[T, int]]:
+        ...
+    @overload
+    def dedup_with_count_by(self, key_selector: Callable[[T, int], Any]) -> Sequence[Tuple[T, int]]:
+        ...
+    @overload
+    def dedup_with_count_by(self, key_selector: Callable[[T, int, Sequence[T]], Any]) -> Sequence[Tuple[T, int]]:
+        ...
+    def dedup_with_count_by(self, key_selector: Callable[..., Any]) -> Sequence[Tuple[T, int]]:
+        """
+        Removes all but the first of consecutive elements and its count that resolve to the same key.
+
+        Example 1:
+        >>> lst = [ 'a1', 'a1', 'b2', 'a2', 'a1']
+        >>> it(lst).dedup_with_count_by(lambda x: x).to_list()
+        [('a1', 2), ('b2', 1), ('a2', 1), ('a1', 1)]
+
+        Example 1:
+        >>> lst = [ 'a1', 'a1', 'b2', 'a2', 'a1']
+        >>> it(lst).sorted().dedup_with_count_by(lambda x: x).to_list()
+        [('a1', 3), ('a2', 1), ('b2', 1)]
+        """
+        return self.dedup_into_group_by(key_selector).map(lambda x: (x[0], len(x)))
+
+    @overload
+    def dedup_into_group_by(self, key_selector: Callable[[T], Any]) -> Sequence[List[T]]:
+        ...
+    @overload
+    def dedup_into_group_by(self, key_selector: Callable[[T, int], Any]) -> Sequence[List[T]]:
+        ...
+    @overload
+    def dedup_into_group_by(self, key_selector: Callable[[T, int, Sequence[T]], Any]) -> Sequence[List[T]]:
+        ...
+    def dedup_into_group_by(self, key_selector: Callable[..., Any]) -> Sequence[List[T]]:
+        return DedupTransform(self, key_selector).as_sequence()
+
     @overload
     def filter(self, predicate: Callable[[T], bool]) -> Sequence[T]:
         ...
@@ -2930,6 +3000,30 @@ class DistinctTransform(SequenceTransform[Iterable[T], T]):
             if k not in seen:
                 seen.add(k)
                 yield e
+
+
+class DedupTransform(SequenceTransform[Iterable[T], List[T]]):
+    def __init__(self, iterable: Iterable[T], key_selector: Optional[Callable[[T], Any]]=None) -> None:
+        super().__init__(iterable)
+        self._key_selector = key_selector
+
+    def __do_iter__(self) -> Iterator[List[T]]:
+        duplicates: List[T] = []
+        seen: Optional[Any] = None
+
+        for e in self._iter:
+            k = self._key_selector(e) if self._key_selector else e
+            if k != seen:
+                if len(duplicates) > 0:
+                    yield duplicates
+                duplicates = [e]
+                seen = k
+                continue
+            duplicates.append(e)
+
+        if len(duplicates) > 0:
+            yield duplicates
+
 
 
 class Grouping(NamedTuple, Generic[K, T]):
