@@ -1,4 +1,10 @@
+
+[private]
+alias t := test
+
+
 # list available commands
+[private]
 default:
     @just --list
 
