@@ -33,10 +33,12 @@
                     <li><a href="pyiter/distinct.html">distinct</a></li>
                     <li><a href="pyiter/drop.html">drop</a></li>
                     <li><a href="pyiter/drop_while.html">drop_while</a></li>
+                    <li><a href="pyiter/error.html">error</a></li>
                     <li><a href="pyiter/filtering.html">filtering</a></li>
                     <li><a href="pyiter/flattening.html">flattening</a></li>
                     <li><a href="pyiter/grouping.html">grouping</a></li>
                     <li><a href="pyiter/intersection.html">intersection</a></li>
+                    <li><a href="pyiter/list_like.html">list_like</a></li>
                     <li><a href="pyiter/mapping.html">mapping</a></li>
                     <li><a href="pyiter/merging.html">merging</a></li>
                     <li><a href="pyiter/merging_with_next.html">merging_with_next</a></li>
@@ -113,7 +115,7 @@ TypeSrcipt and Rust . Enables strong typing and type inference for iterative ope
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">&gt;&gt;&gt; it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">Sequence</span> <span class="c1"># type: ignore</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">sequence</span> <span class="k">as</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">seq</span> <span class="k">as</span> <span class="n">seq</span><span class="p">,</span> <span class="n">it</span> <span class="k">as</span> <span class="n">it</span><span class="p">,</span> <span class="n">Sequence</span> <span class="k">as</span> <span class="n">Sequence</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="n">__ALL__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">,</span> <span class="s2">&quot;seq&quot;</span><span class="p">,</span> <span class="s2">&quot;it&quot;</span><span class="p">,</span> <span class="s2">&quot;Sequence&quot;</span><span class="p">]</span>
