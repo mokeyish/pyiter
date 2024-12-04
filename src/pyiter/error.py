@@ -1,0 +1,2 @@
+class LazyEvaluationException(Exception):
+    pass

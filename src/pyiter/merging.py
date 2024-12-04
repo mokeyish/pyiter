@@ -1,6 +1,7 @@
 from typing import Callable, Iterable, Iterator
 from .transform import Transform, T, O, U
 
+
 # Zipping ?
 class MergingTransform(Transform[T, U]):
     """
@@ -8,11 +9,11 @@ class MergingTransform(Transform[T, U]):
     """
 
     def __init__(
-            self,
-            iter: Iterable[T], 
-            other_iter: Iterable[O], 
-            transform: Callable[[T, O], U] = lambda a,b:(a,b)
-        ):
+        self,
+        iter: Iterable[T],
+        other_iter: Iterable[O],
+        transform: Callable[[T, O], U] = lambda a, b: (a, b),
+    ):
         super().__init__(iter)
         self.other_iter = other_iter
         self.transform = transform

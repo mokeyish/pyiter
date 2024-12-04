@@ -10,6 +10,7 @@ class IntersectionTransform(Transform[Iterable[T], T]):
 
     def __do_iter__(self) -> Iterator[T]:
         from .sequence import it
+
         iters = it(self.iter)
         seen: Set[T] = set()
         for v in iters.first():

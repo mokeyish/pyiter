@@ -7,9 +7,9 @@ class DistinctTransform(Transform[T, T]):
     A transform that removes duplicates from an iterable.
     """
 
-    def __init__(self, iter: Iterable[T], key_selector: Optional[Callable[[T], Any]]=None):
+    def __init__(self, iter: Iterable[T], key_selector: Optional[Callable[[T], Any]] = None):
         super().__init__(iter)
-        self.key_selector  = key_selector
+        self.key_selector = key_selector
 
     def __do_iter__(self) -> Iterator[T]:
         seen: Set[Any] = set()

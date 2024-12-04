@@ -4,6 +4,7 @@ from .transform import Transform, T
 
 class FilteringTransform(Transform[T, T]):
     """Transform that filters elements based on a predicate"""
+
     def __init__(self, iter: Iterable[T], predicate: Callable[[T], bool]):
         super().__init__(iter)
         self.predicate = predicate

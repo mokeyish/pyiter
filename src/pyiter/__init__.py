@@ -14,7 +14,7 @@ Example:
 >>> it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()
 """
 
-from .sequence import sequence, seq, it, Sequence # type: ignore
+from .sequence import sequence as sequence, seq as seq, it as it, Sequence as Sequence
 
 
 __ALL__ = ["sequence", "seq", "it", "Sequence"]

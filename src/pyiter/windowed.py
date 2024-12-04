@@ -1,4 +1,5 @@
 from typing import Deque, Iterable, Iterator, List
+from collections import deque
 from .transform import Transform, T
 
 
@@ -15,9 +16,7 @@ class WindowedTransform(Transform[T, List[T]]):
         self.step = step
         self.partial_windows = partial_windows
 
-
     def __do_iter__(self) -> Iterator[List[T]]:
-        from collections import deque
         window: Deque[T] = deque(maxlen=self.size)
         for e in self.iter:
             window.append(e)

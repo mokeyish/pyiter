@@ -2,6 +2,12 @@
 [private]
 alias t := test
 
+[private]
+alias c := check
+
+[private]
+alias fmt := format
+
 
 # list available commands
 [private]
@@ -28,3 +34,14 @@ docs:
 # install dev requirements
 dev:
     python -m pip install -r requirements-dev.txt
+
+
+# check the code cleanliness
+check:
+  @ruff check
+  @ruff format --check
+
+# format the code
+format:
+  ruff format
+

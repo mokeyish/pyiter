@@ -10,9 +10,8 @@ class TakeWhileTransform(Transform[T, T]):
         self.predicate = predicate
 
     def __do_iter__(self) -> Iterator[T]:
-        is_taking = True
         for e in self.iter:
-            if is_taking and self.predicate(e):
+            if self.predicate(e):
                 yield e
             else:
                 break

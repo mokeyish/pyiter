@@ -4,6 +4,7 @@ from .transform import Transform, T
 
 class FlatteningTransform(Transform[Iterable[T], T]):
     """A transform that flattens an iterable of iterables."""
+
     def __init__(self, iter: Iterable[Iterable[T]]):
         super().__init__(iter)
 

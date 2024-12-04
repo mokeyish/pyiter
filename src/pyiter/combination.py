@@ -1,4 +1,5 @@
 from typing import Iterable, Iterator, Tuple
+from itertools import combinations
 from .transform import Transform, T
 
 
@@ -12,5 +13,4 @@ class CombinationTransform(Transform[T, Tuple[T, ...]]):
         self.n = n
 
     def __do_iter__(self) -> Iterator[Tuple[T, ...]]:
-        from itertools import combinations
         yield from combinations(self.iter, self.n)

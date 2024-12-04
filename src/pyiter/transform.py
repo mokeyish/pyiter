@@ -13,12 +13,16 @@ K = TypeVar("K")
 
 class Transform(ABC, Generic[T, U], Iterable[U]):
     """A transform that applies a function to an iterable."""
+
     iter: Iterable[T]
     cache: Optional[List[U]]
+
     def __init__(self, iter: Iterable[T]):
-        self.iter = iter
+        from .sequence import Sequence
+
+        self.iter = iter.__transform__ if isinstance(iter, Sequence) else iter
         self.cache = None
-    
+
     def __iter__(self) -> Iterator[U]:
         if self.cache:
             yield from self.cache
@@ -46,35 +50,33 @@ class Transform(ABC, Generic[T, U], Iterable[U]):
         if cache is not None:
             return len(cache)
         return 0
-    
+
     def __repr__(self) -> str:
         return self.__class__.__name__
 
     @abstractmethod
-    def __do_iter__(self) -> Iterator[U] :
+    def __do_iter__(self) -> Iterator[U]:
         raise NotImplementedError
-    
+
     def transforms(self) -> "Iterable[Transform[Any, Any]]":
-        from .sequence import Sequence
         inner = self.iter
-        if isinstance(inner, Sequence):
-            yield from inner.__transform__.transforms()
-        elif isinstance(inner, Transform):
+        if isinstance(inner, Transform):
             yield from inner.transforms()
         yield self
-
-    
-
-    
 
 
 class NonTransform(Transform[T, T]):
     """
     A [Transform] that does not transform the values.
     """
+
     def __init__(self, iter: Iterable[T]) -> None:
         super().__init__(iter)
-    
+        self.cache = iter if isinstance(iter, list) else [*iter]
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}[{self.iter.__class__.__name__}]"
+
     def __do_iter__(self) -> Iterator[T]:
         yield from self.iter
 
@@ -82,8 +84,18 @@ class NonTransform(Transform[T, T]):
         if not isinstance(self.iter, Transform):
             # not Sequence, just a wrapper of List, Tuple.etc.
             # we can get lenght of it directly.
-            if hasattr(self.iter, '__len__'):
-                return len(self.iter) # type: ignore
-            elif hasattr(self.iter, '__length_hint__'):
+            if hasattr(self.iter, "__len__"):
+                return len(self.iter)  # type: ignore
+            elif hasattr(self.iter, "__length_hint__"):
                 return self.iter.__length_hint__()  # type: ignore
         return super().__len__()
+
+
+def new_transform(iter: Iterable[T]) -> Transform[Any, T]:
+    from .sequence import Sequence
+
+    if isinstance(iter, Sequence):
+        return iter.__transform__
+    if isinstance(iter, Transform):
+        return iter  # type: ignore
+    return NonTransform(iter)

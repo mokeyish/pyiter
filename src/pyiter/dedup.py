@@ -7,9 +7,9 @@ class DedupTransform(Transform[T, List[T]]):
     A transform that groups consecutive duplicates from an iterable.
     """
 
-    def __init__(self, iter: Iterable[T], key_selector: Optional[Callable[[T], Any]]=None):
+    def __init__(self, iter: Iterable[T], key_selector: Optional[Callable[[T], Any]] = None):
         super().__init__(iter)
-        self.key_selector  = key_selector
+        self.key_selector = key_selector
 
     def __do_iter__(self) -> Iterator[List[T]]:
         duplicates: List[T] = []
