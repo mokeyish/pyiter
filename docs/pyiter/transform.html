@@ -52,6 +52,9 @@
                     <a class="class" href="#NonTransform">NonTransform</a>
             </li>
             <li>
+                    <a class="class" href="#InfinityTransform">InfinityTransform</a>
+            </li>
+            <li>
                     <a class="function" href="#new_transform">new_transform</a>
             </li>
     </ul>
@@ -76,7 +79,7 @@
                         <label class="view-source-button" for="mod-transform-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generator</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
@@ -168,14 +171,36 @@
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span>
 </span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">new_transform</span><span class="p">(</span><span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Transform</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">class</span> <span class="nc">InfinityTransform</span><span class="p">(</span><span class="n">Transform</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Transform that iterates over an infinite sequence.&quot;&quot;&quot;</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">__transform__</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Transform</span><span class="p">):</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="k">return</span> <span class="n">NonTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iter</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]&quot;</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">def</span> <span class="nf">__do_iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Cannot determine the length of an infinite sequence.&quot;</span><span class="p">)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span> <span class="nf">new_transform</span><span class="p">(</span><span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Transform</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>        <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">__transform__</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Transform</span><span class="p">):</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Generator</span><span class="p">):</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="k">return</span> <span class="n">InfinityTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">return</span> <span class="n">NonTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -350,6 +375,53 @@
                                 </dl>
                             </div>
                 </section>
+                <section id="InfinityTransform">
+                            <input id="InfinityTransform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">InfinityTransform</span><wbr>(<span class="base"><a href="#Transform">pyiter.transform.Transform[~T, ~T]</a></span>):
+
+                <label class="view-source-button" for="InfinityTransform-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#InfinityTransform"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="InfinityTransform-95"><a href="#InfinityTransform-95"><span class="linenos"> 95</span></a><span class="k">class</span> <span class="nc">InfinityTransform</span><span class="p">(</span><span class="n">Transform</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+</span><span id="InfinityTransform-96"><a href="#InfinityTransform-96"><span class="linenos"> 96</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Transform that iterates over an infinite sequence.&quot;&quot;&quot;</span>
+</span><span id="InfinityTransform-97"><a href="#InfinityTransform-97"><span class="linenos"> 97</span></a>
+</span><span id="InfinityTransform-98"><a href="#InfinityTransform-98"><span class="linenos"> 98</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="InfinityTransform-99"><a href="#InfinityTransform-99"><span class="linenos"> 99</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+</span><span id="InfinityTransform-100"><a href="#InfinityTransform-100"><span class="linenos">100</span></a>
+</span><span id="InfinityTransform-101"><a href="#InfinityTransform-101"><span class="linenos">101</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="InfinityTransform-102"><a href="#InfinityTransform-102"><span class="linenos">102</span></a>        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">iter</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]&quot;</span>
+</span><span id="InfinityTransform-103"><a href="#InfinityTransform-103"><span class="linenos">103</span></a>
+</span><span id="InfinityTransform-104"><a href="#InfinityTransform-104"><span class="linenos">104</span></a>    <span class="k">def</span> <span class="nf">__do_iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>
+</span><span id="InfinityTransform-105"><a href="#InfinityTransform-105"><span class="linenos">105</span></a>        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter</span>
+</span><span id="InfinityTransform-106"><a href="#InfinityTransform-106"><span class="linenos">106</span></a>
+</span><span id="InfinityTransform-107"><a href="#InfinityTransform-107"><span class="linenos">107</span></a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="InfinityTransform-108"><a href="#InfinityTransform-108"><span class="linenos">108</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="InfinityTransform-109"><a href="#InfinityTransform-109"><span class="linenos">109</span></a>            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+</span><span id="InfinityTransform-110"><a href="#InfinityTransform-110"><span class="linenos">110</span></a>        <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">&quot;Cannot determine the length of an infinite sequence.&quot;</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Transform that iterates over an infinite sequence.</p>
+</div>
+
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#Transform">Transform</a></dt>
+                                <dd id="InfinityTransform.__init__" class="function"><a href="#Transform.__init__">Transform</a></dd>
+                <dd id="InfinityTransform.iter" class="variable"><a href="#Transform.iter">iter</a></dd>
+                <dd id="InfinityTransform.cache" class="variable"><a href="#Transform.cache">cache</a></dd>
+                <dd id="InfinityTransform.transforms" class="function"><a href="#Transform.transforms">transforms</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="new_transform">
                             <input id="new_transform-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -361,14 +433,18 @@
 
     </div>
     <a class="headerlink" href="#new_transform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="new_transform-95"><a href="#new_transform-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">new_transform</span><span class="p">(</span><span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Transform</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
-</span><span id="new_transform-96"><a href="#new_transform-96"><span class="linenos"> 96</span></a>    <span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
-</span><span id="new_transform-97"><a href="#new_transform-97"><span class="linenos"> 97</span></a>
-</span><span id="new_transform-98"><a href="#new_transform-98"><span class="linenos"> 98</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-</span><span id="new_transform-99"><a href="#new_transform-99"><span class="linenos"> 99</span></a>        <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">__transform__</span>
-</span><span id="new_transform-100"><a href="#new_transform-100"><span class="linenos">100</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Transform</span><span class="p">):</span>
-</span><span id="new_transform-101"><a href="#new_transform-101"><span class="linenos">101</span></a>        <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
-</span><span id="new_transform-102"><a href="#new_transform-102"><span class="linenos">102</span></a>    <span class="k">return</span> <span class="n">NonTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="new_transform-113"><a href="#new_transform-113"><span class="linenos">113</span></a><span class="k">def</span> <span class="nf">new_transform</span><span class="p">(</span><span class="nb">iter</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Transform</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
+</span><span id="new_transform-114"><a href="#new_transform-114"><span class="linenos">114</span></a>    <span class="kn">from</span> <span class="nn">.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+</span><span id="new_transform-115"><a href="#new_transform-115"><span class="linenos">115</span></a>
+</span><span id="new_transform-116"><a href="#new_transform-116"><span class="linenos">116</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+</span><span id="new_transform-117"><a href="#new_transform-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">__transform__</span>
+</span><span id="new_transform-118"><a href="#new_transform-118"><span class="linenos">118</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Transform</span><span class="p">):</span>
+</span><span id="new_transform-119"><a href="#new_transform-119"><span class="linenos">119</span></a>        <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
+</span><span id="new_transform-120"><a href="#new_transform-120"><span class="linenos">120</span></a>
+</span><span id="new_transform-121"><a href="#new_transform-121"><span class="linenos">121</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Generator</span><span class="p">):</span>
+</span><span id="new_transform-122"><a href="#new_transform-122"><span class="linenos">122</span></a>        <span class="k">return</span> <span class="n">InfinityTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="new_transform-123"><a href="#new_transform-123"><span class="linenos">123</span></a>
+</span><span id="new_transform-124"><a href="#new_transform-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">NonTransform</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
 </span></pre></div>
 
 
