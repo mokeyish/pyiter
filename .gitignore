@@ -3,5 +3,5 @@
 /dist/
 __pycache__
 *.egg-info/
-/main.py
+/main*.py
 /build/

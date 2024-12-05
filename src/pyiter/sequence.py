@@ -18,7 +18,6 @@ from typing import (
     Optional,
     Tuple,
     Type,
-    TypeVar,
     Callable,
     Literal,
     NamedTuple,
@@ -37,16 +36,14 @@ if TYPE_CHECKING:
 from functools import cached_property
 import sys
 
+
 if sys.version_info < (3, 11):
     # Generic NamedTuple
     origin__namedtuple_mro_entries = NamedTuple.__mro_entries__  # type: ignore
     NamedTuple.__mro_entries__ = lambda bases: origin__namedtuple_mro_entries(bases[:1])  # type: ignore
 
-from .transform import Transform, NonTransform, new_transform, T, U, K
-
-V = TypeVar("V")
-
-IterableS = TypeVar("IterableS", bound=Iterable[Any])
+from .transform import Transform, NonTransform, new_transform, T, U, K, O as V
+from .error import LazyEvaluationException
 
 
 class Sequence(Generic[T], Iterable[T]):
@@ -70,11 +67,11 @@ class Sequence(Generic[T], Iterable[T]):
 
     @property
     def data(self) -> List[T]:
-        if self.__transform__.cache is None:
-            from .error import LazyEvaluationException
-
+        if self.__transform__.cache is not None:
+            return self.__transform__.cache.copy()
+        if is_debugging():
             raise LazyEvaluationException("The sequence has not been evaluated yet.")
-        return self.__transform__.cache
+        return self.to_list()
 
     def dedup(self) -> Sequence[T]:
         """
@@ -2782,7 +2779,9 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(['b', 'c', 'a']).to_list()
         ['b', 'c', 'a']
         """
-        return list(self)
+        if self.__transform__.cache is not None:
+            return self.__transform__.cache.copy()
+        return [s for s in self]
 
     async def to_list_async(self: Iterable[Awaitable[T]]) -> List[T]:
         """
@@ -2925,6 +2924,21 @@ def none_or(value: Optional[T], default: T) -> T:
 
 def none_or_else(value: Optional[T], f: Callable[[], T]) -> T:
     return value if value is not None else f()
+
+
+def is_debugging() -> bool:
+    from inspect import currentframe
+    from traceback import walk_stack
+
+    return (
+        it(walk_stack(currentframe()))
+        .take(20)
+        .map(lambda s: s[0])
+        .any(
+            lambda s: s.f_code.co_name == "get_contents_debug_adapter_protocol"
+            and "pydevd_resolver.py" in s.f_code.co_filename
+        )
+    )
 
 
 class SequenceProducer:

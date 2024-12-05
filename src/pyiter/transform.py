@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Iterable, Iterator, List, Optional, TypeVar
+from typing import Any, Generic, Iterable, Iterator, List, Optional, TypeVar, Generator
 
 
 T = TypeVar("T")
@@ -91,6 +91,24 @@ class NonTransform(Transform[T, T]):
         return super().__len__()
 
 
+class InfinityTransform(Transform[T, T]):
+    """Transform that iterates over an infinite sequence."""
+
+    def __init__(self, iter: Iterable[T]) -> None:
+        super().__init__(iter)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}[{self.iter.__class__.__name__}]"
+
+    def __do_iter__(self) -> Iterator[T]:
+        yield from self.iter
+
+    def __len__(self) -> int:
+        if self.cache is not None:
+            return len(self.cache)
+        raise OverflowError("Cannot determine the length of an infinite sequence.")
+
+
 def new_transform(iter: Iterable[T]) -> Transform[Any, T]:
     from .sequence import Sequence
 
@@ -98,4 +116,8 @@ def new_transform(iter: Iterable[T]) -> Transform[Any, T]:
         return iter.__transform__
     if isinstance(iter, Transform):
         return iter  # type: ignore
+
+    if isinstance(iter, Generator):
+        return InfinityTransform(iter)  # type: ignore
+
     return NonTransform(iter)
