@@ -176,7 +176,12 @@ class Sequence(Generic[T], Iterable[T]):
         [1, 3]
 
         """
-        return self.filter(lambda x: isinstance(x, typ))  # type: ignore
+        from .type_guard import TypeGuardTransform, TypeGuard
+
+        def guard(x: T) -> TypeGuard[U]:
+            return isinstance(x, typ)
+
+        return it(TypeGuardTransform(self, guard))
 
     @overload
     def filter_not(self, predicate: Callable[[T], bool]) -> Sequence[T]: ...
@@ -214,15 +219,46 @@ class Sequence(Generic[T], Iterable[T]):
         >>> it(lst).filter_not_none().to_list()
         ['a', 'b']
         """
-        return self.filter(lambda x: x is not None)  # type: ignore
+        from .type_guard import TypeGuardTransform, TypeGuard
+
+        def guard(x: Optional[U]) -> TypeGuard[U]:
+            return x is not None
+
+        return it(TypeGuardTransform(self, guard))
 
     @overload
     def map(self, transform: Callable[[T], U]) -> Sequence[U]: ...
     @overload
+    def map(
+        self, transform: Callable[[T], U], return_exceptions: Literal[False]
+    ) -> Sequence[U]: ...
+    @overload
+    def map(
+        self, transform: Callable[[T], U], return_exceptions: Literal[True]
+    ) -> Sequence[Union[U, BaseException]]: ...
+    @overload
     def map(self, transform: Callable[[T, int], U]) -> Sequence[U]: ...
     @overload
+    def map(
+        self, transform: Callable[[T, int], U], return_exceptions: Literal[False]
+    ) -> Sequence[U]: ...
+    @overload
+    def map(
+        self, transform: Callable[[T, int], U], return_exceptions: Literal[True]
+    ) -> Sequence[Union[U, BaseException]]: ...
+    @overload
     def map(self, transform: Callable[[T, int, Sequence[T]], U]) -> Sequence[U]: ...
-    def map(self, transform: Callable[..., U]) -> Sequence[U]:
+    @overload
+    def map(
+        self, transform: Callable[[T, int, Sequence[T]], U], return_exceptions: Literal[False]
+    ) -> Sequence[U]: ...
+    @overload
+    def map(
+        self, transform: Callable[[T, int, Sequence[T]], U], return_exceptions: Literal[True]
+    ) -> Sequence[Union[U, BaseException]]: ...
+    def map(
+        self, transform: Callable[..., U], return_exceptions: bool = False
+    ) -> Union[Sequence[U], Sequence[Union[U, BaseException]]]:
         """
         Returns a Sequence containing the results of applying the given [transform] function
         to each element in the original Sequence.
@@ -244,7 +280,18 @@ class Sequence(Generic[T], Iterable[T]):
         """
         from .mapping import MappingTransform
 
-        return it(MappingTransform(self, self.__callback_overload_warpper__(transform)))
+        transform = self.__callback_overload_warpper__(transform)
+        if return_exceptions:
+
+            def transform_wrapper(x: T) -> Union[U, BaseException]:
+                try:
+                    return transform(x)
+                except BaseException as e:
+                    return e
+
+            return it(MappingTransform(self, transform_wrapper))
+
+        return it(MappingTransform(self, transform))
 
     @overload
     async def map_async(self, transform: Callable[[T], Awaitable[U]]) -> Sequence[U]: ...
@@ -474,14 +521,18 @@ class Sequence(Generic[T], Iterable[T]):
         return v
 
     @overload
-    def first_not_none_of_or_none(self) -> T: ...
+    def first_not_none_of_or_none(self) -> Optional[T]: ...
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T], T]) -> T: ...
+    def first_not_none_of_or_none(self, transform: Callable[[T], T]) -> Optional[T]: ...
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T, int], T]) -> T: ...
+    def first_not_none_of_or_none(self, transform: Callable[[T, int], T]) -> Optional[T]: ...
     @overload
-    def first_not_none_of_or_none(self, transform: Callable[[T, int, Sequence[T]], T]) -> T: ...
-    def first_not_none_of_or_none(self, transform: Optional[Callable[..., T]] = None) -> T:
+    def first_not_none_of_or_none(
+        self, transform: Callable[[T, int, Sequence[T]], T]
+    ) -> Optional[T]: ...
+    def first_not_none_of_or_none(
+        self, transform: Optional[Callable[..., T]] = None
+    ) -> Optional[T]:
         """
         Returns the first non-`None` result of applying the given [transform] function to each element in the original collection.
 
@@ -500,7 +551,7 @@ class Sequence(Generic[T], Iterable[T]):
         return self.map_not_none(transform).first_or_none()
 
     @overload
-    def first_or_none(self) -> T: ...
+    def first_or_none(self) -> Optional[T]: ...
     @overload
     def first_or_none(self, predicate: Callable[[T], bool]) -> Optional[T]: ...
     @overload
