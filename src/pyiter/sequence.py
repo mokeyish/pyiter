@@ -2904,6 +2904,9 @@ class Sequence(Generic[T], Iterable[T]):
     def __len__(self):
         return len(self.__transform__)
 
+    def __bool__(self):
+        return not self.is_empty()
+
     def __repr__(self):
         if self.__transform__.cache is None:
             return "[...]"
