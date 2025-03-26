@@ -94,14 +94,21 @@ class NonTransform(Transform[T, T]):
 class InfinityTransform(Transform[T, T]):
     """Transform that iterates over an infinite sequence."""
 
+    __cache__: List[T]
+
     def __init__(self, iter: Iterable[T]) -> None:
         super().__init__(iter)
+        self.__cache__ = []
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{self.iter.__class__.__name__}]"
 
     def __do_iter__(self) -> Iterator[T]:
-        yield from self.iter
+        cache = self.__cache__
+        yield from cache
+        for x in self.iter:
+            cache.append(x)
+            yield x
 
     def __len__(self) -> int:
         if self.cache is not None:
