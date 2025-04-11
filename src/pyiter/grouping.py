@@ -1,4 +1,4 @@
-from typing import Callable, DefaultDict, Generic, Iterable, Iterator, List, NamedTuple
+from typing import Callable, Generic, Iterable, Iterator, List, NamedTuple
 from .transform import Transform, T, K
 from .list_like import ListLike
 
@@ -18,10 +18,14 @@ class GroupingTransform(Transform[T, Grouping[K, T]]):
         self.key_func = key_func
 
     def __do_iter__(self) -> Iterator[Grouping[K, T]]:
-        from collections import defaultdict
+        from collections import OrderedDict
         from .sequence import it
 
-        d: DefaultDict[K, List[T]] = defaultdict(list)
+        d: OrderedDict[K, List[T]] = OrderedDict()
         for e in self.iter:
-            d[self.key_func(e)].append(e)
+            k = self.key_func(e)
+            v = d.get(k, [])
+            v.append(e)
+            if len(v) == 1:
+                d[k] = v
         yield from it(d.items()).map(lambda x: Grouping(x[0], ListLike(x[1])))

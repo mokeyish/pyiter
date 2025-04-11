@@ -2474,13 +2474,11 @@ class Sequence(Generic[T], Iterable[T]):
     @overload
     def shuffled(self) -> Sequence[T]: ...
     @overload
-    def shuffled(self, seed: int) -> Sequence[T]: ...
-    @overload
-    def shuffled(self, seed: str) -> Sequence[T]: ...
+    def shuffled(self, seed: Union[int, float, str, bytes, bytearray, None]) -> Sequence[T]: ...
     @overload
     def shuffled(self, random: "Random") -> Sequence[T]: ...
     def shuffled(  # type: ignore
-        self, random: Optional[Union["Random", int, str]] = None
+        self, seed: Union["Random", int, float, str, bytes, bytearray, None] = None
     ) -> Sequence[T]:
         """
         Returns a sequence that yields elements of this sequence randomly shuffled
@@ -2504,7 +2502,7 @@ class Sequence(Generic[T], Iterable[T]):
         """
         from .shuffling import ShufflingTransform
 
-        return it(ShufflingTransform(self, random))
+        return it(ShufflingTransform(self, seed))
 
     @overload
     def partition(self, predicate: Callable[[T], bool]) -> "Tuple[ListLike[T], ListLike[T]]": ...
@@ -2729,11 +2727,11 @@ class Sequence(Generic[T], Iterable[T]):
         self, progress_func: Union[Literal["tqdm"], Literal["tqdm_rich"]]
     ) -> Sequence[T]: ...
     @overload
-    def progress(self, progress_func: Callable[[Iterable[T]], Iterable[T]]) -> Sequence[T]: ...
+    def progress(self, progress_func: Callable[[Sequence[T]], Iterable[T]]) -> Sequence[T]: ...
     def progress(
         self,
         progress_func: Union[
-            Callable[[Iterable[T]], Iterable[T]],
+            Callable[[Sequence[T]], Iterable[T]],
             Literal["tqdm"],
             Literal["tqdm_rich"],
             None,
@@ -2749,13 +2747,15 @@ class Sequence(Generic[T], Iterable[T]):
         >>> for _ in it(list(range(10))).progress(lambda x: tqdm(x, total=len(x))).to_list(): pass
         """
         if progress_func is not None and callable(progress_func):
-            from .progress import ProgressTransform
-
-            return it(ProgressTransform(self, progress_func))
+            return it(progress_func(self))
 
         def import_tqdm():
             if progress_func == "tqdm_rich":
+                import warnings
                 from tqdm.rich import tqdm
+                from tqdm import TqdmExperimentalWarning
+
+                warnings.filterwarnings("ignore", category=TqdmExperimentalWarning)
             else:
                 from tqdm import tqdm
             return tqdm

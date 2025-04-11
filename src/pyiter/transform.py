@@ -72,7 +72,7 @@ class NonTransform(Transform[T, T]):
 
     def __init__(self, iter: Iterable[T]) -> None:
         super().__init__(iter)
-        self.cache = iter if isinstance(iter, list) else [*iter]
+        # self.cache = iter if isinstance(iter, list) else [*iter]
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{self.iter.__class__.__name__}]"
@@ -121,10 +121,14 @@ def new_transform(iter: Iterable[T]) -> Transform[Any, T]:
 
     if isinstance(iter, Sequence):
         return iter.__transform__
+
     if isinstance(iter, Transform):
         return iter  # type: ignore
 
     if isinstance(iter, Generator):
         return InfinityTransform(iter)  # type: ignore
+
+    if isinstance(iter, (list, tuple)):
+        return NonTransform(iter)
 
     return NonTransform(iter)
