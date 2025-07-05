@@ -1,6 +1,0 @@
-pdoc
-build
-twine
-tqdm
-ruff
-pytest

@@ -1,47 +1,63 @@
-
-[private]
+alias b := build
 alias t := test
-
-[private]
 alias c := check
-
-[private]
+alias v := version
 alias fmt := format
 
 
 # list available commands
 [private]
 default:
-    @just --list
+  @just --list
 
-# run tests arguments: -v to verbose
-test args='':
-    python src/pyiter/sequence.py {{args}}
+#------------#
+# versioning #
+#------------#
 
-# package as wheel
-package:
-    rm -rf dist
-    python -m build
+# Increment manifest version: major, minor, patch
+bump BUMP="patch":
+  @uv version --bump {{BUMP}}
 
-# publish package to pypi
-publish: package
-    python -m twine upload --repository pypi dist/*
+# Print current version
+version:
+  @uv version --short
 
-# build docs
+#----------#
+# building #
+#----------#
+
+# Build Python packages into source distributions and wheels
+build:
+  @rm -rf dist build
+  uv build
+
+# Upload distributions to an index
+publish: build
+  uvx twine upload --repository pypi dist/*
+
+# Build documentation using pdoc
 docs:
-    python -m pdoc src/pyiter -t src/templates -o docs
+  uv run -m pdoc src/pyiter -t src/templates -o docs
 
-# install dev requirements
-dev:
-    python -m pip install -r requirements-dev.txt
+#---------------#
+# running tests #
+#---------------#
+
+# Run tests arguments: -v to verbose
+test *args:
+  uv run src/pyiter/sequence.py {{args}}
+
+#-----------------------#
+# code quality and misc #
+#-----------------------#
 
 
 # check the code cleanliness
 check:
-  @ruff check
-  @ruff format --check
+  @uvx ruff check
+  @uvx ruff format --check
 
 # format the code
 format:
-  ruff format
+  @uvx ruff format
 
