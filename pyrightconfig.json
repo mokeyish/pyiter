@@ -1,0 +1,5 @@
+{
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": "information",
+  "reportRedeclaration": false
+}
