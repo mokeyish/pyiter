@@ -1,6 +1,6 @@
 [project]
 name = "pyiter"
-version = "0.13.7"
+version = "0.13.8"
 description = "PyIter is a Python package for iterative operations inspired by the Kotlin、CSharp(linq)、TypeSrcipt and Rust. Enables strong typing and type inference for iterative operations."
 readme = "README.md"
 authors = [
@@ -16,13 +16,18 @@ dependencies = [
     "typing-extensions>=4.14.0",
 ]
 
+[dependency-groups]
+dev = [
+    "pdoc>=15.0.4",
+    "pyright>=1.1.403",
+    "ruff>=0.12.1",
+    "tqdm>=4.67.1",
+]
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[dependency-groups]
-dev = [
-    "pdoc>=15.0.4",
-    "ruff>=0.12.1",
-    "tqdm>=4.67.1",
-]
+[tool.setuptools.package-dir]
+"pyiter" = "src/pyiter"
+"pyiter-stubs" = "typings/pyiter"

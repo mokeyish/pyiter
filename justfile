@@ -52,12 +52,16 @@ test *args:
 #-----------------------#
 
 
-# check the code cleanliness
-check:
+# Check the code cleanliness
+check: type-check
   @uvx ruff check
   @uvx ruff format --check
 
-# format the code
+# Strict type checking
+type-check:
+  uv run pyright-python src/*
+
+# Format the code
 format:
   @uvx ruff format
 
