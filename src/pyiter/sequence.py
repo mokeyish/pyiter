@@ -62,7 +62,7 @@ class Sequence(Generic[T], Iterable[T]):
         self.__transform__ = new_transform(iterable)
 
     @cached_property
-    def transforms(self):
+    def transforms(self) -> Iterable[Transform[Any, Any]]:
         return [*self.__transform__.transforms()]
 
     @property
@@ -309,7 +309,7 @@ class Sequence(Generic[T], Iterable[T]):
     ) -> Sequence[U]: ...
     async def map_async(
         self, transform: Callable[..., Awaitable[U]], return_exceptions: bool = False
-    ):
+    ) -> Union[Sequence[U], Sequence[Union[U, BaseException]]]:
         """
         Similar to `.map()` but you can input a async transform then await it.
         """
@@ -2460,7 +2460,7 @@ class Sequence(Generic[T], Iterable[T]):
 
         return ListLike(a), ListLike(b)
 
-    def with_index(self):
+    def with_index(self) -> Sequence[IndexedValue[T]]:
         """
         Returns a sequence containing the elements of this sequence and their indexes.
 
@@ -2901,18 +2901,18 @@ class Sequence(Generic[T], Iterable[T]):
     def __do_iter__(self) -> Iterator[T]:
         yield from self.__transform__
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__transform__)
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return not self.is_empty()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.__transform__.cache is None:
             return "[...]"
         return repr(self.to_list())
 
-    def __getitem__(self, key: int):
+    def __getitem__(self, key: int) -> T:
         """
         Returns the element at the specified [index] in the Sequence.
 
@@ -3021,13 +3021,15 @@ class SequenceProducer:
             data = json.load(f, **kwargs)  # type: ignore
             return self(data)
 
-    def csv(self, filepath: str):
+    def csv(self, filepath: str) -> Sequence[List[str]] | Sequence[Dict[str, str]]:
         """
         Reads and parses the input of a csv file.
         """
         return self.read_csv(filepath)
 
-    def read_csv(self, filepath: str, header: Optional[int] = 0):
+    def read_csv(
+        self, filepath: str, header: Optional[int] = 0
+    ) -> Sequence[List[str]] | Sequence[Dict[str, str]]:
         """
         Reads and parses the input of a csv file.
 
