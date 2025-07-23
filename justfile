@@ -27,13 +27,17 @@ version:
 #----------#
 
 # Build Python packages into source distributions and wheels
-build:
-  @rm -rf dist build
+build: clean
   uv build
 
 # Upload distributions to an index
 publish: build
   uvx twine upload --repository pypi dist/*
+
+# Generate type stubs
+stubgen:
+  rm -rf typings
+  uv run pyright --createstub pyiter
 
 # Build documentation using pdoc
 docs:
@@ -63,5 +67,8 @@ type-check:
 
 # Format the code
 format:
-  @uvx ruff format
+  @uv run ruff format
 
+# Clean
+clean:
+  @rm -rf dist build

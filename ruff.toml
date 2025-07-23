@@ -6,6 +6,7 @@ exclude = [
     ".cargo",
     ".rustup",
     ".cache",
+    "*.pyi",
     "venv",
     "node_modules",
     "site-packages",

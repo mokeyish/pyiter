@@ -17,7 +17,7 @@ class Transform(ABC, Generic[T, U], Iterable[U]):
     iter: Iterable[T]
     cache: Optional[List[U]]
 
-    def __init__(self, iter: Iterable[T]):
+    def __init__(self, iter: Iterable[T], *args: Any, **kwargs: Any):
         from .sequence import Sequence
 
         self.iter = iter.__transform__ if isinstance(iter, Sequence) else iter

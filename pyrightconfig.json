@@ -1,5 +1,5 @@
 {
-  "typeCheckingMode": "standard",
-  "reportMissingTypeStubs": "information",
-  "reportRedeclaration": false
+    "typeCheckingMode": "strict",
+    "reportMissingTypeStubs": "information",
+    "reportRedeclaration": false
 }
