@@ -63,7 +63,7 @@ check: type-check
 
 # Strict type checking
 type-check:
-  uv run pyright-python src/*
+  uv run pyright-python src/pyiter
 
 # Format the code
 format:

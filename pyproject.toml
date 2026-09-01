@@ -10,7 +10,7 @@ license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 dependencies = ["typing-extensions>=4.14.0"]
 
 [dependency-groups]
-dev = ["pdoc>=15.0.4", "pyright>=1.1.403", "ruff>=0.12.1", "tqdm>=4.67.1"]
+dev = ["pdoc>=15.0.4", "pyright>=1.1.411", "ruff>=0.12.1", "tqdm>=4.67.1"]
 
 [build-system]
 requires = ["setuptools", "wheel"]

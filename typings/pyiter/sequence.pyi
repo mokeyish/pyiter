@@ -984,34 +984,34 @@ class Sequence(Generic[T], Iterable[T]):
         ...
     
     @overload
-    def index_of_last_o_else(self, predicate: Callable[[T], bool], f: Callable[[], int]) -> int:
+    def index_of_last_or_else(self, predicate: Callable[[T], bool], f: Callable[[], int]) -> int:
         ...
     
     @overload
-    def index_of_last_o_else(self, predicate: Callable[[T, int], bool], f: Callable[[], int]) -> int:
+    def index_of_last_or_else(self, predicate: Callable[[T, int], bool], f: Callable[[], int]) -> int:
         ...
     
     @overload
-    def index_of_last_o_else(self, predicate: Callable[[T, int, Sequence[T]], bool], f: Callable[[], int]) -> int:
+    def index_of_last_or_else(self, predicate: Callable[[T, int, Sequence[T]], bool], f: Callable[[], int]) -> int:
         ...
     
-    def index_of_last_o_else(self, predicate: Callable[..., bool], f: Callable[[], int]) -> int:
+    def index_of_last_or_else(self, predicate: Callable[..., bool], f: Callable[[], int]) -> int:
         """
         Returns last index of element matching the given [predicate], or default value if no such element was found.
 
         Example 1:
         >>> lst = ['a', 'b', 'c', 'b']
-        >>> it(lst).index_of_last_o_else(lambda x: x == 'b', lambda: -len(lst))
+        >>> it(lst).index_of_last_or_else(lambda x: x == 'b', lambda: -len(lst))
         3
 
         Example 2:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).index_of_last_o_else(lambda x: x == 'd', lambda: -len(lst))
+        >>> it(lst).index_of_last_or_else(lambda x: x == 'd', lambda: -len(lst))
         -3
 
         Example 3:
         >>> lst = ['a', 'b', 'c']
-        >>> it(lst).index_of_last_o_else(lambda x: x == 'a', lambda: -len(lst))
+        >>> it(lst).index_of_last_or_else(lambda x: x == 'a', lambda: -len(lst))
         0
         """
         ...
@@ -1139,6 +1139,55 @@ class Sequence(Generic[T], Iterable[T]):
         """
         ...
     
+    @overload
+    def drop_until(self, predicate: Callable[[T], bool]) -> Sequence[T]:
+        ...
+    
+    @overload
+    def drop_until(self, predicate: Callable[[T, int], bool]) -> Sequence[T]:
+        ...
+    
+    @overload
+    def drop_until(self, predicate: Callable[[T, int, Sequence[T]], bool]) -> Sequence[T]:
+        ...
+    
+    def drop_until(self, predicate: Callable[..., bool]) -> Sequence[T]:
+        """
+        Returns a Sequence containing all elements except the first elements dropped until the first element that satisfies the given [predicate].
+
+        Example 1:
+        >>> lst = [1, 2, 3, 4, 1]
+        >>> it(lst).drop_until(lambda x: x >= 3).to_list()
+        [3, 4, 1]
+
+        Example 2:
+        >>> lst = [1, 2, 1, 4]
+        >>> it(lst).drop_until(lambda x: x == 4).to_list()
+        [4]
+        """
+        ...
+    
+    def drop_last(self, n: int) -> Sequence[T]:
+        """
+        Returns a Sequence containing all elements except last [n] elements.
+
+        Example 1:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).drop_last(0).to_list()
+        ['a', 'b', 'c']
+
+        Example 2:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).drop_last(1).to_list()
+        ['a', 'b']
+
+        Example 3:
+        >>> lst = ['a', 'b', 'c']
+        >>> it(lst).drop_last(4).to_list()
+        []
+        """
+        ...
+    
     def skip(self, n: int) -> Sequence[T]:
         """
         Returns a Sequence containing all elements except first [n] elements.
@@ -1222,6 +1271,34 @@ class Sequence(Generic[T], Iterable[T]):
         """
         ...
     
+    @overload
+    def take_until(self, predicate: Callable[[T], bool]) -> Sequence[T]:
+        ...
+    
+    @overload
+    def take_until(self, predicate: Callable[[T, int], bool]) -> Sequence[T]:
+        ...
+    
+    @overload
+    def take_until(self, predicate: Callable[[T, int, Sequence[T]], bool]) -> Sequence[T]:
+        ...
+    
+    def take_until(self, predicate: Callable[..., bool]) -> Sequence[T]:
+        """
+        Returns a Sequence containing the first elements taken until the first element that satisfies the given [predicate].
+
+        Example 1:
+        >>> lst = [1, 2, 3, 4]
+        >>> it(lst).take_until(lambda x: x > 2).to_list()
+        [1, 2]
+
+        Example 2:
+        >>> lst = [1, 2, 3, 4]
+        >>> it(lst).take_until(lambda x: x > 10).to_list()
+        [1, 2, 3, 4]
+        """
+        ...
+    
     def take_last(self, n: int) -> Sequence[T]:
         """
         Returns an Sequence containing last [n] elements.
@@ -1235,6 +1312,11 @@ class Sequence(Generic[T], Iterable[T]):
         >>> a = ['a', 'b', 'c']
         >>> it(a).take_last(2).to_list()
         ['b', 'c']
+
+        Example 3:
+        >>> a = ['a', 'b', 'c']
+        >>> it(a).take_last(10).to_list()
+        ['a', 'b', 'c']
         """
         ...
     
@@ -2884,8 +2966,8 @@ class SequenceProducer:
     
 
 
-sequence: SequenceProducer = ...
-seq: SequenceProducer = ...
-it: SequenceProducer = ...
+sequence = ...
+seq = ...
+it = ...
 if __name__ == "__main__":
     ...
