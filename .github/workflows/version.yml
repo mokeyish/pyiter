@@ -1,0 +1,102 @@
+# .github/workflows/version.yml
+# Manually triggered: bump version in pyproject.toml, commit + tag,
+# then build and publish the package to PyPI.
+# Publishing uses PyPI Trusted Publishing (OIDC), no token secret needed.
+# Configure once: https://pypi.org/manage/<user>/published/ -> pyiter
+#   -> "Add a new trusted publisher" with:
+#     Owner: mokeyish  Repository: pyiter
+#     Workflow: Bump & Publish  Environment: pypi
+name: Bump & Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Bump version'
+        required: true
+        type: choice
+        options: [patch, minor, major]
+        default: 'patch'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: version
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Install just
+        uses: extractions/setup-just@v3
+
+      - name: Bump version ${{ github.event.inputs.bump }}
+        run: |
+          just bump ${{ github.event.inputs.bump }}
+          echo "version=v$(just version)" >> "$GITHUB_ENV"
+
+      - name: Regenerate stubs and docs
+        run: |
+          just stubgen
+          just docs
+
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "🔖 Bump version to $version"
+          git tag -a "$version" -m ""
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+  publish:
+    needs: bump
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pyiter/
+    permissions:
+      id-token: write # required for PyPI Trusted Publishing (OIDC)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.bump.outputs.version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build
+        run: uv build
+
+      # Tokenless publish via PyPI Trusted Publishing (OIDC): the action
+      # exchanges the job's id-token for a short-lived PyPI API token
+      # itself. Requires a Trusted Publisher on PyPI (see file header)
+      # and the job-level id-token: write permission above.
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist

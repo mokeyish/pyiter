@@ -30,18 +30,25 @@ version:
 build: clean
   uv build
 
-# Upload distributions to an index
+# Upload distributions to PyPI
 publish: build
-  uvx twine upload --repository pypi dist/*
+  uvx twine upload --non-interactive --repository-url https://upload.pypi.org/legacy/ dist/*
 
 # Generate type stubs
 stubgen:
   rm -rf typings
   uv run pyright --createstub pyiter
 
-# Build documentation using pdoc
+# Build documentation using pdoc.
+# pyiter-stubs is a symlink to pyright-generated stubs; pdoc would pick up
+# their pyright header docstrings over the real ones, so hide the symlink
+# for the duration of the render. The trap restores it even on failure.
+# Stale generated files (e.g. from removed modules) are cleaned first,
+# keeping CNAME (GitHub Pages) which pdoc does not regenerate.
 docs:
-  uv run -m pdoc src/pyiter -t src/templates -o docs
+  rm -f docs/index.html docs/pyiter.html docs/search.js
+  rm -rf docs/pyiter
+  trap '[ ! -e src/pyiter-stubs.hide ] || mv src/pyiter-stubs.hide src/pyiter-stubs' EXIT; mv src/pyiter-stubs src/pyiter-stubs.hide; uv run -m pdoc src/pyiter -t src/templates -o docs
 
 #---------------#
 # running tests #
