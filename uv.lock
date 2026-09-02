@@ -115,7 +115,7 @@ wheels = [
 
 [[package]]
 name = "pyiter"
-version = "0.13.9"
+version = "0.13.10"
 source = { editable = "." }
 dependencies = [
     { name = "typing-extensions" },
