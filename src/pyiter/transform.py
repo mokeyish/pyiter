@@ -18,9 +18,9 @@ class Transform(ABC, Generic[T, U], Iterable[U]):
     cache: Optional[List[U]]
 
     def __init__(self, iter: Iterable[T], *args: Any, **kwargs: Any):
-        from .sequence import Sequence
+        from .stream import Stream
 
-        self.iter = iter.__transform__ if isinstance(iter, Sequence) else iter
+        self.iter = iter.__transform__ if isinstance(iter, Stream) else iter
         self.cache = None
 
     def __iter__(self) -> Iterator[U]:
@@ -35,7 +35,7 @@ class Transform(ABC, Generic[T, U], Iterable[U]):
 
     def __len__(self) -> int:
         # if not isinstance(self.iter, Transform):
-        #     # not Sequence, just a wrapper of List, Tuple.etc.
+        #     # not Stream, just a wrapper of List, Tuple.etc.
         #     # we can get lenght of it directly.
         #     if hasattr(self.iter, '__len__'):
         #         return len(self.iter) # type: ignore
@@ -82,7 +82,7 @@ class NonTransform(Transform[T, T]):
 
     def __len__(self) -> int:
         if not isinstance(self.iter, Transform):
-            # not Sequence, just a wrapper of List, Tuple.etc.
+            # not Stream, just a wrapper of List, Tuple.etc.
             # we can get lenght of it directly.
             if hasattr(self.iter, "__len__"):
                 return len(self.iter)  # type: ignore
@@ -117,9 +117,9 @@ class InfinityTransform(Transform[T, T]):
 
 
 def new_transform(iter: Iterable[T]) -> Transform[Any, T]:
-    from .sequence import Sequence
+    from .stream import Stream
 
-    if isinstance(iter, Sequence):
+    if isinstance(iter, Stream):
         return iter.__transform__
 
     if isinstance(iter, Transform):

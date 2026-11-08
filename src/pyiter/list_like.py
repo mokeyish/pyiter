@@ -1,9 +1,9 @@
 from typing import Any, Callable, Iterable, List, Union, overload
-from .sequence import Sequence
+from .stream import Stream
 from .transform import T, new_transform
 
 
-class ListLike(List[T], Sequence[T]):
+class ListLike(List[T], Stream[T]):
     def __init__(self, iterable: Iterable[T] = []):
         super().__init__(iterable)
         self.__transform__ = new_transform(iterable)
@@ -15,10 +15,10 @@ class ListLike(List[T], Sequence[T]):
     @overload
     def count(self, predicate: Callable[[T, int], bool]) -> int: ...
     @overload
-    def count(self, predicate: Callable[[T, int, Sequence[T]], bool]) -> int: ...
+    def count(self, predicate: Callable[[T, int, Stream[T]], bool]) -> int: ...
     def count(self, predicate: Union[Callable[..., bool], Any, None] = None) -> int:
         """
-        Returns the number of elements in the Sequence that satisfy the specified [predicate] function.
+        Returns the number of elements in the Stream that satisfy the specified [predicate] function.
 
         Example 1:
         >>> lst = [1, 2, 3]

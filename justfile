@@ -35,9 +35,13 @@ publish: build
   uvx twine upload --non-interactive --repository-url https://upload.pypi.org/legacy/ dist/*
 
 # Generate type stubs
+# pyright --createstub drops pure re-export modules, so the hand-maintained
+# sequence.pyi (backwards-compat re-export of stream) is preserved verbatim.
 stubgen:
+  cp typings/pyiter/sequence.pyi /tmp/pyiter-sequence.pyi.keep 2>/dev/null || true
   rm -rf typings
   uv run pyright --createstub pyiter
+  mv /tmp/pyiter-sequence.pyi.keep typings/pyiter/sequence.pyi
 
 # Build documentation using pdoc.
 # pyiter-stubs is a symlink to pyright-generated stubs; pdoc would pick up
@@ -56,7 +60,7 @@ docs:
 
 # Run tests arguments: -v to verbose
 test *args:
-  uv run src/pyiter/sequence.py {{args}}
+  uv run src/pyiter/stream.py {{args}}
 
 #-----------------------#
 # code quality and misc #

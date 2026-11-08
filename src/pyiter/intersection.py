@@ -9,7 +9,7 @@ class IntersectionTransform(Transform[Iterable[T], T]):
         super().__init__(iter)
 
     def __do_iter__(self) -> Iterator[T]:
-        from .sequence import it
+        from .stream import it
 
         iters = it(self.iter)
         seen: Set[T] = set()

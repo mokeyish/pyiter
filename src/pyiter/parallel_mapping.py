@@ -24,7 +24,7 @@ class ParallelMappingTransform(Transform[T, U]):
 
     def __do_iter__(self) -> Iterator[U]:
         import os
-        from .sequence import it
+        from .stream import it
 
         def create_executor(max_workers: int):
             if self.executor == "Process":

@@ -58,11 +58,11 @@
                         <label class="view-source-button" for="mod-list_like-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.sequence</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.stream</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stream</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">T</span><span class="p">,</span> <span class="n">new_transform</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ListLike</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ListLike</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__transform__</span> <span class="o">=</span> <span class="n">new_transform</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
@@ -74,10 +74,10 @@
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="nd">@overload</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="nd">@overload</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">        Returns the number of elements in the Sequence that satisfy the specified [predicate] function.</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">        Returns the number of elements in the Stream that satisfy the specified [predicate] function.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">        Example 1:</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">        &gt;&gt;&gt; lst = [1, 2, 3]</span>
@@ -101,13 +101,13 @@
 <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ListLike</span><wbr>(<span class="base">typing.List[~T]</span>, <span class="base"><a href="sequence.html#Sequence">pyiter.sequence.Sequence[~T]</a></span>):
+    <span class="name">ListLike</span><wbr>(<span class="base">typing.List[~T]</span>, <span class="base"><a href="stream.html#Stream">pyiter.stream.Stream[~T]</a></span>):
 
                 <label class="view-source-button" for="ListLike-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ListLike"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ListLike-7"><a href="#ListLike-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ListLike</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ListLike-7"><a href="#ListLike-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ListLike</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 </span><span id="ListLike-8"><a href="#ListLike-8"><span class="linenos"> 8</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
 </span><span id="ListLike-9"><a href="#ListLike-9"><span class="linenos"> 9</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
 </span><span id="ListLike-10"><a href="#ListLike-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__transform__</span> <span class="o">=</span> <span class="n">new_transform</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
@@ -119,10 +119,10 @@
 </span><span id="ListLike-16"><a href="#ListLike-16"><span class="linenos">16</span></a>    <span class="nd">@overload</span>
 </span><span id="ListLike-17"><a href="#ListLike-17"><span class="linenos">17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </span><span id="ListLike-18"><a href="#ListLike-18"><span class="linenos">18</span></a>    <span class="nd">@overload</span>
-</span><span id="ListLike-19"><a href="#ListLike-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
+</span><span id="ListLike-19"><a href="#ListLike-19"><span class="linenos">19</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="o">...</span>
 </span><span id="ListLike-20"><a href="#ListLike-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predicate</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">bool</span><span class="p">],</span> <span class="n">Any</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 </span><span id="ListLike-21"><a href="#ListLike-21"><span class="linenos">21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ListLike-22"><a href="#ListLike-22"><span class="linenos">22</span></a><span class="sd">        Returns the number of elements in the Sequence that satisfy the specified [predicate] function.</span>
+</span><span id="ListLike-22"><a href="#ListLike-22"><span class="linenos">22</span></a><span class="sd">        Returns the number of elements in the Stream that satisfy the specified [predicate] function.</span>
 </span><span id="ListLike-23"><a href="#ListLike-23"><span class="linenos">23</span></a>
 </span><span id="ListLike-24"><a href="#ListLike-24"><span class="linenos">24</span></a><span class="sd">        Example 1:</span>
 </span><span id="ListLike-25"><a href="#ListLike-25"><span class="linenos">25</span></a><span class="sd">        &gt;&gt;&gt; lst = [1, 2, 3]</span>
@@ -150,131 +150,131 @@ The argument must be an iterable if specified.</p>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
-                                    <div><dt><a href="sequence.html#Sequence">pyiter.sequence.Sequence</a></dt>
-                                <dd id="ListLike.__init__" class="function"><a href="sequence.html#Sequence.__init__">Sequence</a></dd>
-                <dd id="ListLike.transforms" class="variable"><a href="sequence.html#Sequence.transforms">transforms</a></dd>
-                <dd id="ListLike.data" class="variable"><a href="sequence.html#Sequence.data">data</a></dd>
-                <dd id="ListLike.dedup" class="function"><a href="sequence.html#Sequence.dedup">dedup</a></dd>
-                <dd id="ListLike.dedup_by" class="function"><a href="sequence.html#Sequence.dedup_by">dedup_by</a></dd>
-                <dd id="ListLike.dedup_with_count_by" class="function"><a href="sequence.html#Sequence.dedup_with_count_by">dedup_with_count_by</a></dd>
-                <dd id="ListLike.dedup_into_group_by" class="function"><a href="sequence.html#Sequence.dedup_into_group_by">dedup_into_group_by</a></dd>
-                <dd id="ListLike.filter" class="function"><a href="sequence.html#Sequence.filter">filter</a></dd>
-                <dd id="ListLike.filter_is_instance" class="function"><a href="sequence.html#Sequence.filter_is_instance">filter_is_instance</a></dd>
-                <dd id="ListLike.filter_not" class="function"><a href="sequence.html#Sequence.filter_not">filter_not</a></dd>
-                <dd id="ListLike.filter_not_none" class="function"><a href="sequence.html#Sequence.filter_not_none">filter_not_none</a></dd>
-                <dd id="ListLike.map" class="function"><a href="sequence.html#Sequence.map">map</a></dd>
-                <dd id="ListLike.map_async" class="function"><a href="sequence.html#Sequence.map_async">map_async</a></dd>
-                <dd id="ListLike.map_not_none" class="function"><a href="sequence.html#Sequence.map_not_none">map_not_none</a></dd>
-                <dd id="ListLike.parallel_map" class="function"><a href="sequence.html#Sequence.parallel_map">parallel_map</a></dd>
-                <dd id="ListLike.find" class="function"><a href="sequence.html#Sequence.find">find</a></dd>
-                <dd id="ListLike.find_last" class="function"><a href="sequence.html#Sequence.find_last">find_last</a></dd>
-                <dd id="ListLike.first" class="function"><a href="sequence.html#Sequence.first">first</a></dd>
-                <dd id="ListLike.first_not_none_of" class="function"><a href="sequence.html#Sequence.first_not_none_of">first_not_none_of</a></dd>
-                <dd id="ListLike.first_not_none_of_or_none" class="function"><a href="sequence.html#Sequence.first_not_none_of_or_none">first_not_none_of_or_none</a></dd>
-                <dd id="ListLike.first_or_none" class="function"><a href="sequence.html#Sequence.first_or_none">first_or_none</a></dd>
-                <dd id="ListLike.first_or_default" class="function"><a href="sequence.html#Sequence.first_or_default">first_or_default</a></dd>
-                <dd id="ListLike.last" class="function"><a href="sequence.html#Sequence.last">last</a></dd>
-                <dd id="ListLike.last_or_none" class="function"><a href="sequence.html#Sequence.last_or_none">last_or_none</a></dd>
-                <dd id="ListLike.index_of_or_none" class="function"><a href="sequence.html#Sequence.index_of_or_none">index_of_or_none</a></dd>
-                <dd id="ListLike.index_of" class="function"><a href="sequence.html#Sequence.index_of">index_of</a></dd>
-                <dd id="ListLike.index_of_or" class="function"><a href="sequence.html#Sequence.index_of_or">index_of_or</a></dd>
-                <dd id="ListLike.index_of_or_else" class="function"><a href="sequence.html#Sequence.index_of_or_else">index_of_or_else</a></dd>
-                <dd id="ListLike.last_index_of_or_none" class="function"><a href="sequence.html#Sequence.last_index_of_or_none">last_index_of_or_none</a></dd>
-                <dd id="ListLike.last_index_of" class="function"><a href="sequence.html#Sequence.last_index_of">last_index_of</a></dd>
-                <dd id="ListLike.last_index_of_or" class="function"><a href="sequence.html#Sequence.last_index_of_or">last_index_of_or</a></dd>
-                <dd id="ListLike.last_index_of_or_else" class="function"><a href="sequence.html#Sequence.last_index_of_or_else">last_index_of_or_else</a></dd>
-                <dd id="ListLike.index_of_first_or_none" class="function"><a href="sequence.html#Sequence.index_of_first_or_none">index_of_first_or_none</a></dd>
-                <dd id="ListLike.index_of_first" class="function"><a href="sequence.html#Sequence.index_of_first">index_of_first</a></dd>
-                <dd id="ListLike.index_of_first_or" class="function"><a href="sequence.html#Sequence.index_of_first_or">index_of_first_or</a></dd>
-                <dd id="ListLike.index_of_first_or_else" class="function"><a href="sequence.html#Sequence.index_of_first_or_else">index_of_first_or_else</a></dd>
-                <dd id="ListLike.index_of_last_or_none" class="function"><a href="sequence.html#Sequence.index_of_last_or_none">index_of_last_or_none</a></dd>
-                <dd id="ListLike.index_of_last" class="function"><a href="sequence.html#Sequence.index_of_last">index_of_last</a></dd>
-                <dd id="ListLike.index_of_last_or" class="function"><a href="sequence.html#Sequence.index_of_last_or">index_of_last_or</a></dd>
-                <dd id="ListLike.index_of_last_or_else" class="function"><a href="sequence.html#Sequence.index_of_last_or_else">index_of_last_or_else</a></dd>
-                <dd id="ListLike.single" class="function"><a href="sequence.html#Sequence.single">single</a></dd>
-                <dd id="ListLike.single_or_none" class="function"><a href="sequence.html#Sequence.single_or_none">single_or_none</a></dd>
-                <dd id="ListLike.drop" class="function"><a href="sequence.html#Sequence.drop">drop</a></dd>
-                <dd id="ListLike.drop_while" class="function"><a href="sequence.html#Sequence.drop_while">drop_while</a></dd>
-                <dd id="ListLike.drop_until" class="function"><a href="sequence.html#Sequence.drop_until">drop_until</a></dd>
-                <dd id="ListLike.drop_last" class="function"><a href="sequence.html#Sequence.drop_last">drop_last</a></dd>
-                <dd id="ListLike.skip" class="function"><a href="sequence.html#Sequence.skip">skip</a></dd>
-                <dd id="ListLike.skip_while" class="function"><a href="sequence.html#Sequence.skip_while">skip_while</a></dd>
-                <dd id="ListLike.take" class="function"><a href="sequence.html#Sequence.take">take</a></dd>
-                <dd id="ListLike.take_while" class="function"><a href="sequence.html#Sequence.take_while">take_while</a></dd>
-                <dd id="ListLike.take_until" class="function"><a href="sequence.html#Sequence.take_until">take_until</a></dd>
-                <dd id="ListLike.take_last" class="function"><a href="sequence.html#Sequence.take_last">take_last</a></dd>
-                <dd id="ListLike.sorted" class="function"><a href="sequence.html#Sequence.sorted">sorted</a></dd>
-                <dd id="ListLike.sorted_by" class="function"><a href="sequence.html#Sequence.sorted_by">sorted_by</a></dd>
-                <dd id="ListLike.sorted_descending" class="function"><a href="sequence.html#Sequence.sorted_descending">sorted_descending</a></dd>
-                <dd id="ListLike.sorted_by_descending" class="function"><a href="sequence.html#Sequence.sorted_by_descending">sorted_by_descending</a></dd>
-                <dd id="ListLike.sorted_with" class="function"><a href="sequence.html#Sequence.sorted_with">sorted_with</a></dd>
-                <dd id="ListLike.associate" class="function"><a href="sequence.html#Sequence.associate">associate</a></dd>
-                <dd id="ListLike.associate_by" class="function"><a href="sequence.html#Sequence.associate_by">associate_by</a></dd>
-                <dd id="ListLike.associate_by_to" class="function"><a href="sequence.html#Sequence.associate_by_to">associate_by_to</a></dd>
-                <dd id="ListLike.all" class="function"><a href="sequence.html#Sequence.all">all</a></dd>
-                <dd id="ListLike.any" class="function"><a href="sequence.html#Sequence.any">any</a></dd>
-                <dd id="ListLike.count" class="function"><a href="sequence.html#Sequence.count">count</a></dd>
-                <dd id="ListLike.contains" class="function"><a href="sequence.html#Sequence.contains">contains</a></dd>
-                <dd id="ListLike.element_at" class="function"><a href="sequence.html#Sequence.element_at">element_at</a></dd>
-                <dd id="ListLike.element_at_or_else" class="function"><a href="sequence.html#Sequence.element_at_or_else">element_at_or_else</a></dd>
-                <dd id="ListLike.element_at_or_default" class="function"><a href="sequence.html#Sequence.element_at_or_default">element_at_or_default</a></dd>
-                <dd id="ListLike.element_at_or_none" class="function"><a href="sequence.html#Sequence.element_at_or_none">element_at_or_none</a></dd>
-                <dd id="ListLike.distinct" class="function"><a href="sequence.html#Sequence.distinct">distinct</a></dd>
-                <dd id="ListLike.distinct_by" class="function"><a href="sequence.html#Sequence.distinct_by">distinct_by</a></dd>
-                <dd id="ListLike.reduce" class="function"><a href="sequence.html#Sequence.reduce">reduce</a></dd>
-                <dd id="ListLike.fold" class="function"><a href="sequence.html#Sequence.fold">fold</a></dd>
-                <dd id="ListLike.sum_of" class="function"><a href="sequence.html#Sequence.sum_of">sum_of</a></dd>
-                <dd id="ListLike.max_of" class="function"><a href="sequence.html#Sequence.max_of">max_of</a></dd>
-                <dd id="ListLike.max_by_or_none" class="function"><a href="sequence.html#Sequence.max_by_or_none">max_by_or_none</a></dd>
-                <dd id="ListLike.max_by" class="function"><a href="sequence.html#Sequence.max_by">max_by</a></dd>
-                <dd id="ListLike.min_of" class="function"><a href="sequence.html#Sequence.min_of">min_of</a></dd>
-                <dd id="ListLike.min_by_or_none" class="function"><a href="sequence.html#Sequence.min_by_or_none">min_by_or_none</a></dd>
-                <dd id="ListLike.min_by" class="function"><a href="sequence.html#Sequence.min_by">min_by</a></dd>
-                <dd id="ListLike.mean_of" class="function"><a href="sequence.html#Sequence.mean_of">mean_of</a></dd>
-                <dd id="ListLike.sum" class="function"><a href="sequence.html#Sequence.sum">sum</a></dd>
-                <dd id="ListLike.max" class="function"><a href="sequence.html#Sequence.max">max</a></dd>
-                <dd id="ListLike.max_or_default" class="function"><a href="sequence.html#Sequence.max_or_default">max_or_default</a></dd>
-                <dd id="ListLike.max_or_none" class="function"><a href="sequence.html#Sequence.max_or_none">max_or_none</a></dd>
-                <dd id="ListLike.min" class="function"><a href="sequence.html#Sequence.min">min</a></dd>
-                <dd id="ListLike.min_or_none" class="function"><a href="sequence.html#Sequence.min_or_none">min_or_none</a></dd>
-                <dd id="ListLike.min_or_default" class="function"><a href="sequence.html#Sequence.min_or_default">min_or_default</a></dd>
-                <dd id="ListLike.mean" class="function"><a href="sequence.html#Sequence.mean">mean</a></dd>
-                <dd id="ListLike.reversed" class="function"><a href="sequence.html#Sequence.reversed">reversed</a></dd>
-                <dd id="ListLike.flat_map" class="function"><a href="sequence.html#Sequence.flat_map">flat_map</a></dd>
-                <dd id="ListLike.flatten" class="function"><a href="sequence.html#Sequence.flatten">flatten</a></dd>
-                <dd id="ListLike.group_by" class="function"><a href="sequence.html#Sequence.group_by">group_by</a></dd>
-                <dd id="ListLike.group_by_to" class="function"><a href="sequence.html#Sequence.group_by_to">group_by_to</a></dd>
-                <dd id="ListLike.for_each" class="function"><a href="sequence.html#Sequence.for_each">for_each</a></dd>
-                <dd id="ListLike.parallel_for_each" class="function"><a href="sequence.html#Sequence.parallel_for_each">parallel_for_each</a></dd>
-                <dd id="ListLike.on_each" class="function"><a href="sequence.html#Sequence.on_each">on_each</a></dd>
-                <dd id="ListLike.parallel_on_each" class="function"><a href="sequence.html#Sequence.parallel_on_each">parallel_on_each</a></dd>
-                <dd id="ListLike.zip" class="function"><a href="sequence.html#Sequence.zip">zip</a></dd>
-                <dd id="ListLike.zip_with_next" class="function"><a href="sequence.html#Sequence.zip_with_next">zip_with_next</a></dd>
-                <dd id="ListLike.unzip" class="function"><a href="sequence.html#Sequence.unzip">unzip</a></dd>
-                <dd id="ListLike.with_index" class="function"><a href="sequence.html#Sequence.with_index">with_index</a></dd>
-                <dd id="ListLike.shuffled" class="function"><a href="sequence.html#Sequence.shuffled">shuffled</a></dd>
-                <dd id="ListLike.partition" class="function"><a href="sequence.html#Sequence.partition">partition</a></dd>
-                <dd id="ListLike.indexed" class="function"><a href="sequence.html#Sequence.indexed">indexed</a></dd>
-                <dd id="ListLike.combinations" class="function"><a href="sequence.html#Sequence.combinations">combinations</a></dd>
-                <dd id="ListLike.nth" class="function"><a href="sequence.html#Sequence.nth">nth</a></dd>
-                <dd id="ListLike.windowed" class="function"><a href="sequence.html#Sequence.windowed">windowed</a></dd>
-                <dd id="ListLike.chunked" class="function"><a href="sequence.html#Sequence.chunked">chunked</a></dd>
-                <dd id="ListLike.repeat" class="function"><a href="sequence.html#Sequence.repeat">repeat</a></dd>
-                <dd id="ListLike.concat" class="function"><a href="sequence.html#Sequence.concat">concat</a></dd>
-                <dd id="ListLike.intersect" class="function"><a href="sequence.html#Sequence.intersect">intersect</a></dd>
-                <dd id="ListLike.union" class="function"><a href="sequence.html#Sequence.union">union</a></dd>
-                <dd id="ListLike.join" class="function"><a href="sequence.html#Sequence.join">join</a></dd>
-                <dd id="ListLike.progress" class="function"><a href="sequence.html#Sequence.progress">progress</a></dd>
-                <dd id="ListLike.typing_as" class="function"><a href="sequence.html#Sequence.typing_as">typing_as</a></dd>
-                <dd id="ListLike.to_set" class="function"><a href="sequence.html#Sequence.to_set">to_set</a></dd>
-                <dd id="ListLike.to_dict" class="function"><a href="sequence.html#Sequence.to_dict">to_dict</a></dd>
-                <dd id="ListLike.to_list" class="function"><a href="sequence.html#Sequence.to_list">to_list</a></dd>
-                <dd id="ListLike.to_list_async" class="function"><a href="sequence.html#Sequence.to_list_async">to_list_async</a></dd>
-                <dd id="ListLike.let" class="function"><a href="sequence.html#Sequence.let">let</a></dd>
-                <dd id="ListLike.also" class="function"><a href="sequence.html#Sequence.also">also</a></dd>
-                <dd id="ListLike.size" class="variable"><a href="sequence.html#Sequence.size">size</a></dd>
-                <dd id="ListLike.is_empty" class="function"><a href="sequence.html#Sequence.is_empty">is_empty</a></dd>
-                <dd id="ListLike.iter" class="function"><a href="sequence.html#Sequence.iter">iter</a></dd>
+                                    <div><dt><a href="stream.html#Stream">pyiter.stream.Stream</a></dt>
+                                <dd id="ListLike.__init__" class="function"><a href="stream.html#Stream.__init__">Stream</a></dd>
+                <dd id="ListLike.transforms" class="variable"><a href="stream.html#Stream.transforms">transforms</a></dd>
+                <dd id="ListLike.data" class="variable"><a href="stream.html#Stream.data">data</a></dd>
+                <dd id="ListLike.dedup" class="function"><a href="stream.html#Stream.dedup">dedup</a></dd>
+                <dd id="ListLike.dedup_by" class="function"><a href="stream.html#Stream.dedup_by">dedup_by</a></dd>
+                <dd id="ListLike.dedup_with_count_by" class="function"><a href="stream.html#Stream.dedup_with_count_by">dedup_with_count_by</a></dd>
+                <dd id="ListLike.dedup_into_group_by" class="function"><a href="stream.html#Stream.dedup_into_group_by">dedup_into_group_by</a></dd>
+                <dd id="ListLike.filter" class="function"><a href="stream.html#Stream.filter">filter</a></dd>
+                <dd id="ListLike.filter_is_instance" class="function"><a href="stream.html#Stream.filter_is_instance">filter_is_instance</a></dd>
+                <dd id="ListLike.filter_not" class="function"><a href="stream.html#Stream.filter_not">filter_not</a></dd>
+                <dd id="ListLike.filter_not_none" class="function"><a href="stream.html#Stream.filter_not_none">filter_not_none</a></dd>
+                <dd id="ListLike.map" class="function"><a href="stream.html#Stream.map">map</a></dd>
+                <dd id="ListLike.map_async" class="function"><a href="stream.html#Stream.map_async">map_async</a></dd>
+                <dd id="ListLike.map_not_none" class="function"><a href="stream.html#Stream.map_not_none">map_not_none</a></dd>
+                <dd id="ListLike.parallel_map" class="function"><a href="stream.html#Stream.parallel_map">parallel_map</a></dd>
+                <dd id="ListLike.find" class="function"><a href="stream.html#Stream.find">find</a></dd>
+                <dd id="ListLike.find_last" class="function"><a href="stream.html#Stream.find_last">find_last</a></dd>
+                <dd id="ListLike.first" class="function"><a href="stream.html#Stream.first">first</a></dd>
+                <dd id="ListLike.first_not_none_of" class="function"><a href="stream.html#Stream.first_not_none_of">first_not_none_of</a></dd>
+                <dd id="ListLike.first_not_none_of_or_none" class="function"><a href="stream.html#Stream.first_not_none_of_or_none">first_not_none_of_or_none</a></dd>
+                <dd id="ListLike.first_or_none" class="function"><a href="stream.html#Stream.first_or_none">first_or_none</a></dd>
+                <dd id="ListLike.first_or_default" class="function"><a href="stream.html#Stream.first_or_default">first_or_default</a></dd>
+                <dd id="ListLike.last" class="function"><a href="stream.html#Stream.last">last</a></dd>
+                <dd id="ListLike.last_or_none" class="function"><a href="stream.html#Stream.last_or_none">last_or_none</a></dd>
+                <dd id="ListLike.index_of_or_none" class="function"><a href="stream.html#Stream.index_of_or_none">index_of_or_none</a></dd>
+                <dd id="ListLike.index_of" class="function"><a href="stream.html#Stream.index_of">index_of</a></dd>
+                <dd id="ListLike.index_of_or" class="function"><a href="stream.html#Stream.index_of_or">index_of_or</a></dd>
+                <dd id="ListLike.index_of_or_else" class="function"><a href="stream.html#Stream.index_of_or_else">index_of_or_else</a></dd>
+                <dd id="ListLike.last_index_of_or_none" class="function"><a href="stream.html#Stream.last_index_of_or_none">last_index_of_or_none</a></dd>
+                <dd id="ListLike.last_index_of" class="function"><a href="stream.html#Stream.last_index_of">last_index_of</a></dd>
+                <dd id="ListLike.last_index_of_or" class="function"><a href="stream.html#Stream.last_index_of_or">last_index_of_or</a></dd>
+                <dd id="ListLike.last_index_of_or_else" class="function"><a href="stream.html#Stream.last_index_of_or_else">last_index_of_or_else</a></dd>
+                <dd id="ListLike.index_of_first_or_none" class="function"><a href="stream.html#Stream.index_of_first_or_none">index_of_first_or_none</a></dd>
+                <dd id="ListLike.index_of_first" class="function"><a href="stream.html#Stream.index_of_first">index_of_first</a></dd>
+                <dd id="ListLike.index_of_first_or" class="function"><a href="stream.html#Stream.index_of_first_or">index_of_first_or</a></dd>
+                <dd id="ListLike.index_of_first_or_else" class="function"><a href="stream.html#Stream.index_of_first_or_else">index_of_first_or_else</a></dd>
+                <dd id="ListLike.index_of_last_or_none" class="function"><a href="stream.html#Stream.index_of_last_or_none">index_of_last_or_none</a></dd>
+                <dd id="ListLike.index_of_last" class="function"><a href="stream.html#Stream.index_of_last">index_of_last</a></dd>
+                <dd id="ListLike.index_of_last_or" class="function"><a href="stream.html#Stream.index_of_last_or">index_of_last_or</a></dd>
+                <dd id="ListLike.index_of_last_or_else" class="function"><a href="stream.html#Stream.index_of_last_or_else">index_of_last_or_else</a></dd>
+                <dd id="ListLike.single" class="function"><a href="stream.html#Stream.single">single</a></dd>
+                <dd id="ListLike.single_or_none" class="function"><a href="stream.html#Stream.single_or_none">single_or_none</a></dd>
+                <dd id="ListLike.drop" class="function"><a href="stream.html#Stream.drop">drop</a></dd>
+                <dd id="ListLike.drop_while" class="function"><a href="stream.html#Stream.drop_while">drop_while</a></dd>
+                <dd id="ListLike.drop_until" class="function"><a href="stream.html#Stream.drop_until">drop_until</a></dd>
+                <dd id="ListLike.drop_last" class="function"><a href="stream.html#Stream.drop_last">drop_last</a></dd>
+                <dd id="ListLike.skip" class="function"><a href="stream.html#Stream.skip">skip</a></dd>
+                <dd id="ListLike.skip_while" class="function"><a href="stream.html#Stream.skip_while">skip_while</a></dd>
+                <dd id="ListLike.take" class="function"><a href="stream.html#Stream.take">take</a></dd>
+                <dd id="ListLike.take_while" class="function"><a href="stream.html#Stream.take_while">take_while</a></dd>
+                <dd id="ListLike.take_until" class="function"><a href="stream.html#Stream.take_until">take_until</a></dd>
+                <dd id="ListLike.take_last" class="function"><a href="stream.html#Stream.take_last">take_last</a></dd>
+                <dd id="ListLike.sorted" class="function"><a href="stream.html#Stream.sorted">sorted</a></dd>
+                <dd id="ListLike.sorted_by" class="function"><a href="stream.html#Stream.sorted_by">sorted_by</a></dd>
+                <dd id="ListLike.sorted_descending" class="function"><a href="stream.html#Stream.sorted_descending">sorted_descending</a></dd>
+                <dd id="ListLike.sorted_by_descending" class="function"><a href="stream.html#Stream.sorted_by_descending">sorted_by_descending</a></dd>
+                <dd id="ListLike.sorted_with" class="function"><a href="stream.html#Stream.sorted_with">sorted_with</a></dd>
+                <dd id="ListLike.associate" class="function"><a href="stream.html#Stream.associate">associate</a></dd>
+                <dd id="ListLike.associate_by" class="function"><a href="stream.html#Stream.associate_by">associate_by</a></dd>
+                <dd id="ListLike.associate_by_to" class="function"><a href="stream.html#Stream.associate_by_to">associate_by_to</a></dd>
+                <dd id="ListLike.all" class="function"><a href="stream.html#Stream.all">all</a></dd>
+                <dd id="ListLike.any" class="function"><a href="stream.html#Stream.any">any</a></dd>
+                <dd id="ListLike.count" class="function"><a href="stream.html#Stream.count">count</a></dd>
+                <dd id="ListLike.contains" class="function"><a href="stream.html#Stream.contains">contains</a></dd>
+                <dd id="ListLike.element_at" class="function"><a href="stream.html#Stream.element_at">element_at</a></dd>
+                <dd id="ListLike.element_at_or_else" class="function"><a href="stream.html#Stream.element_at_or_else">element_at_or_else</a></dd>
+                <dd id="ListLike.element_at_or_default" class="function"><a href="stream.html#Stream.element_at_or_default">element_at_or_default</a></dd>
+                <dd id="ListLike.element_at_or_none" class="function"><a href="stream.html#Stream.element_at_or_none">element_at_or_none</a></dd>
+                <dd id="ListLike.distinct" class="function"><a href="stream.html#Stream.distinct">distinct</a></dd>
+                <dd id="ListLike.distinct_by" class="function"><a href="stream.html#Stream.distinct_by">distinct_by</a></dd>
+                <dd id="ListLike.reduce" class="function"><a href="stream.html#Stream.reduce">reduce</a></dd>
+                <dd id="ListLike.fold" class="function"><a href="stream.html#Stream.fold">fold</a></dd>
+                <dd id="ListLike.sum_of" class="function"><a href="stream.html#Stream.sum_of">sum_of</a></dd>
+                <dd id="ListLike.max_of" class="function"><a href="stream.html#Stream.max_of">max_of</a></dd>
+                <dd id="ListLike.max_by_or_none" class="function"><a href="stream.html#Stream.max_by_or_none">max_by_or_none</a></dd>
+                <dd id="ListLike.max_by" class="function"><a href="stream.html#Stream.max_by">max_by</a></dd>
+                <dd id="ListLike.min_of" class="function"><a href="stream.html#Stream.min_of">min_of</a></dd>
+                <dd id="ListLike.min_by_or_none" class="function"><a href="stream.html#Stream.min_by_or_none">min_by_or_none</a></dd>
+                <dd id="ListLike.min_by" class="function"><a href="stream.html#Stream.min_by">min_by</a></dd>
+                <dd id="ListLike.mean_of" class="function"><a href="stream.html#Stream.mean_of">mean_of</a></dd>
+                <dd id="ListLike.sum" class="function"><a href="stream.html#Stream.sum">sum</a></dd>
+                <dd id="ListLike.max" class="function"><a href="stream.html#Stream.max">max</a></dd>
+                <dd id="ListLike.max_or_default" class="function"><a href="stream.html#Stream.max_or_default">max_or_default</a></dd>
+                <dd id="ListLike.max_or_none" class="function"><a href="stream.html#Stream.max_or_none">max_or_none</a></dd>
+                <dd id="ListLike.min" class="function"><a href="stream.html#Stream.min">min</a></dd>
+                <dd id="ListLike.min_or_none" class="function"><a href="stream.html#Stream.min_or_none">min_or_none</a></dd>
+                <dd id="ListLike.min_or_default" class="function"><a href="stream.html#Stream.min_or_default">min_or_default</a></dd>
+                <dd id="ListLike.mean" class="function"><a href="stream.html#Stream.mean">mean</a></dd>
+                <dd id="ListLike.reversed" class="function"><a href="stream.html#Stream.reversed">reversed</a></dd>
+                <dd id="ListLike.flat_map" class="function"><a href="stream.html#Stream.flat_map">flat_map</a></dd>
+                <dd id="ListLike.flatten" class="function"><a href="stream.html#Stream.flatten">flatten</a></dd>
+                <dd id="ListLike.group_by" class="function"><a href="stream.html#Stream.group_by">group_by</a></dd>
+                <dd id="ListLike.group_by_to" class="function"><a href="stream.html#Stream.group_by_to">group_by_to</a></dd>
+                <dd id="ListLike.for_each" class="function"><a href="stream.html#Stream.for_each">for_each</a></dd>
+                <dd id="ListLike.parallel_for_each" class="function"><a href="stream.html#Stream.parallel_for_each">parallel_for_each</a></dd>
+                <dd id="ListLike.on_each" class="function"><a href="stream.html#Stream.on_each">on_each</a></dd>
+                <dd id="ListLike.parallel_on_each" class="function"><a href="stream.html#Stream.parallel_on_each">parallel_on_each</a></dd>
+                <dd id="ListLike.zip" class="function"><a href="stream.html#Stream.zip">zip</a></dd>
+                <dd id="ListLike.zip_with_next" class="function"><a href="stream.html#Stream.zip_with_next">zip_with_next</a></dd>
+                <dd id="ListLike.unzip" class="function"><a href="stream.html#Stream.unzip">unzip</a></dd>
+                <dd id="ListLike.with_index" class="function"><a href="stream.html#Stream.with_index">with_index</a></dd>
+                <dd id="ListLike.shuffled" class="function"><a href="stream.html#Stream.shuffled">shuffled</a></dd>
+                <dd id="ListLike.partition" class="function"><a href="stream.html#Stream.partition">partition</a></dd>
+                <dd id="ListLike.indexed" class="function"><a href="stream.html#Stream.indexed">indexed</a></dd>
+                <dd id="ListLike.combinations" class="function"><a href="stream.html#Stream.combinations">combinations</a></dd>
+                <dd id="ListLike.nth" class="function"><a href="stream.html#Stream.nth">nth</a></dd>
+                <dd id="ListLike.windowed" class="function"><a href="stream.html#Stream.windowed">windowed</a></dd>
+                <dd id="ListLike.chunked" class="function"><a href="stream.html#Stream.chunked">chunked</a></dd>
+                <dd id="ListLike.repeat" class="function"><a href="stream.html#Stream.repeat">repeat</a></dd>
+                <dd id="ListLike.concat" class="function"><a href="stream.html#Stream.concat">concat</a></dd>
+                <dd id="ListLike.intersect" class="function"><a href="stream.html#Stream.intersect">intersect</a></dd>
+                <dd id="ListLike.union" class="function"><a href="stream.html#Stream.union">union</a></dd>
+                <dd id="ListLike.join" class="function"><a href="stream.html#Stream.join">join</a></dd>
+                <dd id="ListLike.progress" class="function"><a href="stream.html#Stream.progress">progress</a></dd>
+                <dd id="ListLike.typing_as" class="function"><a href="stream.html#Stream.typing_as">typing_as</a></dd>
+                <dd id="ListLike.to_set" class="function"><a href="stream.html#Stream.to_set">to_set</a></dd>
+                <dd id="ListLike.to_dict" class="function"><a href="stream.html#Stream.to_dict">to_dict</a></dd>
+                <dd id="ListLike.to_list" class="function"><a href="stream.html#Stream.to_list">to_list</a></dd>
+                <dd id="ListLike.to_list_async" class="function"><a href="stream.html#Stream.to_list_async">to_list_async</a></dd>
+                <dd id="ListLike.let" class="function"><a href="stream.html#Stream.let">let</a></dd>
+                <dd id="ListLike.also" class="function"><a href="stream.html#Stream.also">also</a></dd>
+                <dd id="ListLike.size" class="variable"><a href="stream.html#Stream.size">size</a></dd>
+                <dd id="ListLike.is_empty" class="function"><a href="stream.html#Stream.is_empty">is_empty</a></dd>
+                <dd id="ListLike.iter" class="function"><a href="stream.html#Stream.iter">iter</a></dd>
 
             </div>
                                 </dl>
