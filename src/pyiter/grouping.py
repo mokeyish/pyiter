@@ -19,7 +19,7 @@ class GroupingTransform(Transform[T, Grouping[K, T]]):
 
     def __do_iter__(self) -> Iterator[Grouping[K, T]]:
         from collections import OrderedDict
-        from .sequence import it
+        from .stream import it
 
         d: OrderedDict[K, List[T]] = OrderedDict()
         for e in self.iter:

@@ -14,4 +14,10 @@ Example:
 >>> it(range(10)).map(lambda x: str(x)).progress(lambda x: tqdm(x, total=x.len)).parallel_map(lambda x: x, max_workers=5).to_list()
 """
 
-from .sequence import sequence as sequence, seq as seq, it as it, Sequence as Sequence
+from .stream import (
+    sequence as sequence,
+    seq as seq,
+    it as it,
+    Stream as Stream,
+    Sequence as Sequence,
+)
