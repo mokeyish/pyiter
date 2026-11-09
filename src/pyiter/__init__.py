@@ -15,9 +15,11 @@ Example:
 """
 
 from .stream import (
-    sequence as sequence,
-    seq as seq,
     it as it,
     Stream as Stream,
+)
+from .sequence import (
+    sequence as sequence,
+    seq as seq,
     Sequence as Sequence,
 )

@@ -1,28 +1,33 @@
 """
-Deprecated module. The stream implementation now lives in `pyiter.stream`.
+Hand-maintained stub for the `pyiter.sequence` backwards-compatibility module.
 
-This stub is kept (hand-maintained) so that `from pyiter.sequence import ...`
-keeps type-checking. It re-exports every public name from `pyiter.stream`.
-Please import from `pyiter.stream` (or the top-level `pyiter` package) instead.
+`pyiter.stream` only carries the current design (`Stream`, `StreamProducer`,
+`it`); the deprecated entrypoints live in `pyiter.sequence`. This stub
+declares the real definitions (sequence / seq / Sequence / SequenceProducer)
+*and* re-exports the rest from `pyiter.stream`, so `from pyiter.sequence
+import ...` keeps type-checking for every public name.
 
-NOTE: pyright --createstub drops pure re-export modules, so this file is
-preserved verbatim by the `just stubgen` recipe after regeneration.
+NOTE: `pyright --createstub` only emits the real definitions here (it does
+not trace the `__all__` re-imports), so this file is preserved verbatim by
+the `just stubgen` recipe after regeneration.
 """
 
 from .stream import (  # re-export for backwards compatibility
     AutoIncrementIndex,
     IndexedValue,
-    Sequence,
-    SequenceProducer,
     Stream,
+    StreamProducer,
     it,
     is_debugging,
     none_or,
     none_or_else,
-    seq,
-    sequence,
     throw,
 )
+
+sequence: StreamProducer = ...
+seq: StreamProducer = ...
+Sequence = Stream
+SequenceProducer = StreamProducer
 
 __all__ = [
     "AutoIncrementIndex",
@@ -30,6 +35,7 @@ __all__ = [
     "Sequence",
     "SequenceProducer",
     "Stream",
+    "StreamProducer",
     "is_debugging",
     "it",
     "none_or",

@@ -3077,7 +3077,7 @@ def is_debugging() -> bool:
     )
 
 
-class SequenceProducer:
+class StreamProducer:
     @overload
     def __call__(self, elements: List[T]) -> Stream[T]: ...
     @overload
@@ -3148,41 +3148,7 @@ class SequenceProducer:
         return __package__ or self.__class__.__name__
 
 
-sequence = SequenceProducer()
-"""
-    Creates an iterator from a list of elements or given Iterable.
-
-    Example 1:
->>> sequence('hello', 'world').map(lambda x: x.upper()).to_list()
-['HELLO', 'WORLD']
-
-    Example 2:
->>> sequence(['hello', 'world']).map(lambda x: x.upper()).to_list()
-['HELLO', 'WORLD']
-
-    Example 3:
->>> sequence(range(10)).map(lambda x: x*x).to_list()
-[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-"""
-
-seq = sequence
-"""
-    Creates an iterator from a list of elements or given Iterable.
-
-    Example 1:
->>> seq('hello', 'world').map(lambda x: x.upper()).to_list()
-['HELLO', 'WORLD']
-
-    Example 2:
->>> seq(['hello', 'world']).map(lambda x: x.upper()).to_list()
-['HELLO', 'WORLD']
-
-    Example 3:
->>> seq(range(10)).map(lambda x: x*x).to_list()
-[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-"""
-
-it = sequence
+it: StreamProducer = StreamProducer()
 """
     Creates an iterator from a list of elements or given Iterable.
 
@@ -3197,11 +3163,6 @@ it = sequence
     Example 3:
 >>> it(range(10)).map(lambda x: x*x).to_list()
 [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-"""
-
-Sequence = Stream
-"""
-Deprecated. Use [Stream] instead.
 """
 
 
