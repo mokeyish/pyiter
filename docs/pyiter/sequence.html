@@ -61,19 +61,7 @@
                     <a class="variable" href="#Sequence">Sequence</a>
             </li>
             <li>
-                    <a class="class" href="#SequenceProducer">SequenceProducer</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#SequenceProducer.json">json</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#SequenceProducer.csv">csv</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#SequenceProducer.read_csv">read_csv</a>
-                        </li>
-                </ul>
-
+                    <a class="variable" href="#SequenceProducer">SequenceProducer</a>
             </li>
             <li>
                     <a class="class" href="#Stream">Stream</a>
@@ -454,6 +442,21 @@
 
             </li>
             <li>
+                    <a class="class" href="#StreamProducer">StreamProducer</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#StreamProducer.json">json</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#StreamProducer.csv">csv</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#StreamProducer.read_csv">read_csv</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="function" href="#is_debugging">is_debugging</a>
             </li>
             <li>
@@ -490,11 +493,16 @@
                     <h1 class="modulename">
 <a href="./../pyiter.html">pyiter</a><wbr>.sequence    </h1>
 
-                        <div class="docstring"><p>Deprecated module. The stream implementation now lives in <code><a href="stream.html">pyiter.stream</a></code>.</p>
+                        <div class="docstring"><p>Deprecated compatibility module.</p>
 
-<p>This module is kept only for backwards compatibility so that existing code
-doing <code>from <a href="">pyiter.sequence</a> import ...</code> continues to work. It re-exports every
-public name from <code><a href="stream.html">pyiter.stream</a></code>. Please import from <code><a href="stream.html">pyiter.stream</a></code> (or the
+<p>The stream implementation now lives in <code><a href="stream.html">pyiter.stream</a></code>, and the current
+entrypoint is <code><a href="#it">pyiter.it</a></code>. This module is kept only so that existing code
+doing <code>from <a href="">pyiter.sequence</a> import ...</code> (or importing the deprecated
+<code><a href="#sequence">sequence</a></code> / <code><a href="#seq">seq</a></code> names) keeps working.</p>
+
+<p>The deprecated entrypoints are <em>defined here</em> (not in <code><a href="stream.html">pyiter.stream</a></code>), so
+<code><a href="stream.html">pyiter.stream</a></code> only carries the current design. Every other public name is
+re-exported from <code><a href="stream.html">pyiter.stream</a></code>. Please import from <code><a href="stream.html">pyiter.stream</a></code> (or the
 top-level <code><a href="../pyiter.html">pyiter</a></code> package) instead.</p>
 </div>
 
@@ -503,43 +511,92 @@ top-level <code><a href="../pyiter.html">pyiter</a></code> package) instead.</p>
                         <label class="view-source-button" for="mod-sequence-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">Deprecated module. The stream implementation now lives in `pyiter.stream`.</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">Deprecated compatibility module.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">This module is kept only for backwards compatibility so that existing code</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">doing `from pyiter.sequence import ...` continues to work. It re-exports every</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">public name from `pyiter.stream`. Please import from `pyiter.stream` (or the</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">top-level `pyiter` package) instead.</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.stream</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># re-export for backwards compatibility</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">AutoIncrementIndex</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">IndexedValue</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">Sequence</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">SequenceProducer</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">Stream</span><span class="p">,</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">it</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">is_debugging</span><span class="p">,</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">none_or</span><span class="p">,</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">none_or_else</span><span class="p">,</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">seq</span><span class="p">,</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">sequence</span><span class="p">,</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">throw</span><span class="p">,</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="p">)</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;AutoIncrementIndex&quot;</span><span class="p">,</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="s2">&quot;IndexedValue&quot;</span><span class="p">,</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="s2">&quot;Sequence&quot;</span><span class="p">,</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="s2">&quot;SequenceProducer&quot;</span><span class="p">,</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;Stream&quot;</span><span class="p">,</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;is_debugging&quot;</span><span class="p">,</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="s2">&quot;it&quot;</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="s2">&quot;none_or&quot;</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="s2">&quot;none_or_else&quot;</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="s2">&quot;seq&quot;</span><span class="p">,</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="s2">&quot;sequence&quot;</span><span class="p">,</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="s2">&quot;throw&quot;</span><span class="p">,</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="p">]</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">The stream implementation now lives in `pyiter.stream`, and the current</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">entrypoint is `pyiter.it`. This module is kept only so that existing code</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">doing `from pyiter.sequence import ...` (or importing the deprecated</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">`sequence` / `seq` names) keeps working.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">The deprecated entrypoints are *defined here* (not in `pyiter.stream`), so</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">`pyiter.stream` only carries the current design. Every other public name is</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">re-exported from `pyiter.stream`. Please import from `pyiter.stream` (or the</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">top-level `pyiter` package) instead.</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.stream</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># re-export for backwards compatibility</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">AutoIncrementIndex</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">IndexedValue</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">Stream</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">StreamProducer</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">it</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">is_debugging</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">none_or</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">none_or_else</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">throw</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="p">)</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="c1"># region deprecated entrypoints (defined here so pyiter.stream stays clean)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">sequence</span><span class="p">:</span> <span class="n">StreamProducer</span> <span class="o">=</span> <span class="n">StreamProducer</span><span class="p">()</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">Deprecated. Use `pyiter.it` instead.</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">    Example 1:</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">&gt;&gt;&gt; sequence(&#39;hello&#39;, &#39;world&#39;).map(lambda x: x.upper()).to_list()</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    Example 2:</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">&gt;&gt;&gt; sequence([&#39;hello&#39;, &#39;world&#39;]).map(lambda x: x.upper()).to_list()</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    Example 3:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">&gt;&gt;&gt; sequence(range(10)).map(lambda x: x*x).to_list()</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="n">seq</span><span class="p">:</span> <span class="n">StreamProducer</span> <span class="o">=</span> <span class="n">sequence</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">Deprecated. Use `pyiter.it` instead.</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">    Example 1:</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">&gt;&gt;&gt; seq(&#39;hello&#39;, &#39;world&#39;).map(lambda x: x.upper()).to_list()</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="sd">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a><span class="sd">    Example 2:</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="sd">&gt;&gt;&gt; seq([&#39;hello&#39;, &#39;world&#39;]).map(lambda x: x.upper()).to_list()</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">    Example 3:</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">&gt;&gt;&gt; seq(range(10)).map(lambda x: x*x).to_list()</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="n">Sequence</span> <span class="o">=</span> <span class="n">Stream</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">Deprecated. Use [Stream] instead.</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="n">SequenceProducer</span> <span class="o">=</span> <span class="n">StreamProducer</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="sd">Deprecated. Use [StreamProducer] instead.</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a><span class="c1"># endregion</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    <span class="s2">&quot;AutoIncrementIndex&quot;</span><span class="p">,</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>    <span class="s2">&quot;IndexedValue&quot;</span><span class="p">,</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>    <span class="s2">&quot;Sequence&quot;</span><span class="p">,</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>    <span class="s2">&quot;SequenceProducer&quot;</span><span class="p">,</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>    <span class="s2">&quot;Stream&quot;</span><span class="p">,</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>    <span class="s2">&quot;StreamProducer&quot;</span><span class="p">,</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>    <span class="s2">&quot;is_debugging&quot;</span><span class="p">,</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>    <span class="s2">&quot;it&quot;</span><span class="p">,</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>    <span class="s2">&quot;none_or&quot;</span><span class="p">,</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>    <span class="s2">&quot;none_or_else&quot;</span><span class="p">,</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>    <span class="s2">&quot;seq&quot;</span><span class="p">,</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>    <span class="s2">&quot;sequence&quot;</span><span class="p">,</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>    <span class="s2">&quot;throw&quot;</span><span class="p">,</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a><span class="p">]</span>
 </span></pre></div>
 
 
@@ -654,207 +711,24 @@ top-level <code><a href="../pyiter.html">pyiter</a></code> package) instead.</p>
     </div>
     <a class="headerlink" href="#Sequence"></a>
     
-    
+            <div class="docstring"><p>Deprecated. Use [Stream] instead.</p>
+</div>
+
 
                 </section>
                 <section id="SequenceProducer">
-                            <input id="SequenceProducer-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">SequenceProducer</span>:
+                    <div class="attr variable">
+            <span class="name">SequenceProducer</span>        =
+<span class="default_value">&lt;class &#39;<a href="#StreamProducer">StreamProducer</a>&#39;&gt;</span>
 
-                <label class="view-source-button" for="SequenceProducer-view-source"><span>View Source</span></label>
-
+        
     </div>
     <a class="headerlink" href="#SequenceProducer"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SequenceProducer-3081"><a href="#SequenceProducer-3081"><span class="linenos">3081</span></a><span class="k">class</span><span class="w"> </span><span class="nc">SequenceProducer</span><span class="p">:</span>
-</span><span id="SequenceProducer-3082"><a href="#SequenceProducer-3082"><span class="linenos">3082</span></a>    <span class="nd">@overload</span>
-</span><span id="SequenceProducer-3083"><a href="#SequenceProducer-3083"><span class="linenos">3083</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
-</span><span id="SequenceProducer-3084"><a href="#SequenceProducer-3084"><span class="linenos">3084</span></a>    <span class="nd">@overload</span>
-</span><span id="SequenceProducer-3085"><a href="#SequenceProducer-3085"><span class="linenos">3085</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
-</span><span id="SequenceProducer-3086"><a href="#SequenceProducer-3086"><span class="linenos">3086</span></a>    <span class="nd">@overload</span>
-</span><span id="SequenceProducer-3087"><a href="#SequenceProducer-3087"><span class="linenos">3087</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">elements</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
-</span><span id="SequenceProducer-3088"><a href="#SequenceProducer-3088"><span class="linenos">3088</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer-3089"><a href="#SequenceProducer-3089"><span class="linenos">3089</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="SequenceProducer-3090"><a href="#SequenceProducer-3090"><span class="linenos">3090</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">iterable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="SequenceProducer-3091"><a href="#SequenceProducer-3091"><span class="linenos">3091</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Stream</span><span class="p">):</span>
-</span><span id="SequenceProducer-3092"><a href="#SequenceProducer-3092"><span class="linenos">3092</span></a>                <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer-3093"><a href="#SequenceProducer-3093"><span class="linenos">3093</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="SequenceProducer-3094"><a href="#SequenceProducer-3094"><span class="linenos">3094</span></a>                <span class="k">return</span> <span class="n">Stream</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer-3095"><a href="#SequenceProducer-3095"><span class="linenos">3095</span></a>        <span class="k">return</span> <span class="n">Stream</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer-3096"><a href="#SequenceProducer-3096"><span class="linenos">3096</span></a>
-</span><span id="SequenceProducer-3097"><a href="#SequenceProducer-3097"><span class="linenos">3097</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-</span><span id="SequenceProducer-3098"><a href="#SequenceProducer-3098"><span class="linenos">3098</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3099"><a href="#SequenceProducer-3099"><span class="linenos">3099</span></a><span class="sd">        Reads and parses the input of a json file.</span>
-</span><span id="SequenceProducer-3100"><a href="#SequenceProducer-3100"><span class="linenos">3100</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3101"><a href="#SequenceProducer-3101"><span class="linenos">3101</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-</span><span id="SequenceProducer-3102"><a href="#SequenceProducer-3102"><span class="linenos">3102</span></a>
-</span><span id="SequenceProducer-3103"><a href="#SequenceProducer-3103"><span class="linenos">3103</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="SequenceProducer-3104"><a href="#SequenceProducer-3104"><span class="linenos">3104</span></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer-3105"><a href="#SequenceProducer-3105"><span class="linenos">3105</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span id="SequenceProducer-3106"><a href="#SequenceProducer-3106"><span class="linenos">3106</span></a>
-</span><span id="SequenceProducer-3107"><a href="#SequenceProducer-3107"><span class="linenos">3107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-</span><span id="SequenceProducer-3108"><a href="#SequenceProducer-3108"><span class="linenos">3108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3109"><a href="#SequenceProducer-3109"><span class="linenos">3109</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
-</span><span id="SequenceProducer-3110"><a href="#SequenceProducer-3110"><span class="linenos">3110</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3111"><a href="#SequenceProducer-3111"><span class="linenos">3111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-</span><span id="SequenceProducer-3112"><a href="#SequenceProducer-3112"><span class="linenos">3112</span></a>
-</span><span id="SequenceProducer-3113"><a href="#SequenceProducer-3113"><span class="linenos">3113</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span>
-</span><span id="SequenceProducer-3114"><a href="#SequenceProducer-3114"><span class="linenos">3114</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="SequenceProducer-3115"><a href="#SequenceProducer-3115"><span class="linenos">3115</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-</span><span id="SequenceProducer-3116"><a href="#SequenceProducer-3116"><span class="linenos">3116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3117"><a href="#SequenceProducer-3117"><span class="linenos">3117</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
-</span><span id="SequenceProducer-3118"><a href="#SequenceProducer-3118"><span class="linenos">3118</span></a>
-</span><span id="SequenceProducer-3119"><a href="#SequenceProducer-3119"><span class="linenos">3119</span></a><span class="sd">        Example 1:</span>
-</span><span id="SequenceProducer-3120"><a href="#SequenceProducer-3120"><span class="linenos">3120</span></a><span class="sd">        &gt;&gt;&gt; it.read_csv(&#39;tests/data/a.csv&#39;).to_list()</span>
-</span><span id="SequenceProducer-3121"><a href="#SequenceProducer-3121"><span class="linenos">3121</span></a><span class="sd">        [{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
-</span><span id="SequenceProducer-3122"><a href="#SequenceProducer-3122"><span class="linenos">3122</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer-3123"><a href="#SequenceProducer-3123"><span class="linenos">3123</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
-</span><span id="SequenceProducer-3124"><a href="#SequenceProducer-3124"><span class="linenos">3124</span></a>
-</span><span id="SequenceProducer-3125"><a href="#SequenceProducer-3125"><span class="linenos">3125</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span>
-</span><span id="SequenceProducer-3126"><a href="#SequenceProducer-3126"><span class="linenos">3126</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="SequenceProducer-3127"><a href="#SequenceProducer-3127"><span class="linenos">3127</span></a>            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="SequenceProducer-3128"><a href="#SequenceProducer-3128"><span class="linenos">3128</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">it</span><span class="p">(</span><span class="o">*</span><span class="n">reader</span><span class="p">)</span>
-</span><span id="SequenceProducer-3129"><a href="#SequenceProducer-3129"><span class="linenos">3129</span></a>            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="SequenceProducer-3130"><a href="#SequenceProducer-3130"><span class="linenos">3130</span></a>                <span class="k">return</span> <span class="nb">iter</span>
-</span><span id="SequenceProducer-3131"><a href="#SequenceProducer-3131"><span class="linenos">3131</span></a>
-</span><span id="SequenceProducer-3132"><a href="#SequenceProducer-3132"><span class="linenos">3132</span></a>            <span class="n">headers</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">element_at_or_none</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-</span><span id="SequenceProducer-3133"><a href="#SequenceProducer-3133"><span class="linenos">3133</span></a>            <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="SequenceProducer-3134"><a href="#SequenceProducer-3134"><span class="linenos">3134</span></a>                <span class="k">if</span> <span class="n">header</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="SequenceProducer-3135"><a href="#SequenceProducer-3135"><span class="linenos">3135</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="SequenceProducer-3136"><a href="#SequenceProducer-3136"><span class="linenos">3136</span></a>                <span class="k">else</span><span class="p">:</span>
-</span><span id="SequenceProducer-3137"><a href="#SequenceProducer-3137"><span class="linenos">3137</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">)</span>
-</span><span id="SequenceProducer-3138"><a href="#SequenceProducer-3138"><span class="linenos">3138</span></a>
-</span><span id="SequenceProducer-3139"><a href="#SequenceProducer-3139"><span class="linenos">3139</span></a>                <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-</span><span id="SequenceProducer-3140"><a href="#SequenceProducer-3140"><span class="linenos">3140</span></a>                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">it</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">associate_by</span><span class="p">(</span>
-</span><span id="SequenceProducer-3141"><a href="#SequenceProducer-3141"><span class="linenos">3141</span></a>                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="SequenceProducer-3142"><a href="#SequenceProducer-3142"><span class="linenos">3142</span></a>                            <span class="n">headers</span><span class="p">[</span><span class="n">ordinal</span><span class="p">]</span> <span class="k">if</span> <span class="n">ordinal</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;undefined_</span><span class="si">{</span><span class="n">ordinal</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span id="SequenceProducer-3143"><a href="#SequenceProducer-3143"><span class="linenos">3143</span></a>                        <span class="p">)</span>
-</span><span id="SequenceProducer-3144"><a href="#SequenceProducer-3144"><span class="linenos">3144</span></a>                    <span class="p">)</span>
-</span><span id="SequenceProducer-3145"><a href="#SequenceProducer-3145"><span class="linenos">3145</span></a>                <span class="p">)</span>
-</span><span id="SequenceProducer-3146"><a href="#SequenceProducer-3146"><span class="linenos">3146</span></a>            <span class="k">return</span> <span class="nb">iter</span>
-</span><span id="SequenceProducer-3147"><a href="#SequenceProducer-3147"><span class="linenos">3147</span></a>
-</span><span id="SequenceProducer-3148"><a href="#SequenceProducer-3148"><span class="linenos">3148</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="SequenceProducer-3149"><a href="#SequenceProducer-3149"><span class="linenos">3149</span></a>        <span class="k">return</span> <span class="n">__package__</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-</span></pre></div>
-
-
     
-
-                            <div id="SequenceProducer.json" class="classattr">
-                                        <input id="SequenceProducer.json-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">json</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>:</span></span>
-
-                <label class="view-source-button" for="SequenceProducer.json-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#SequenceProducer.json"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SequenceProducer.json-3097"><a href="#SequenceProducer.json-3097"><span class="linenos">3097</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
-</span><span id="SequenceProducer.json-3098"><a href="#SequenceProducer.json-3098"><span class="linenos">3098</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.json-3099"><a href="#SequenceProducer.json-3099"><span class="linenos">3099</span></a><span class="sd">        Reads and parses the input of a json file.</span>
-</span><span id="SequenceProducer.json-3100"><a href="#SequenceProducer.json-3100"><span class="linenos">3100</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.json-3101"><a href="#SequenceProducer.json-3101"><span class="linenos">3101</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-</span><span id="SequenceProducer.json-3102"><a href="#SequenceProducer.json-3102"><span class="linenos">3102</span></a>
-</span><span id="SequenceProducer.json-3103"><a href="#SequenceProducer.json-3103"><span class="linenos">3103</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="SequenceProducer.json-3104"><a href="#SequenceProducer.json-3104"><span class="linenos">3104</span></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-</span><span id="SequenceProducer.json-3105"><a href="#SequenceProducer.json-3105"><span class="linenos">3105</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Reads and parses the input of a json file.</p>
+            <div class="docstring"><p>Deprecated. Use [StreamProducer] instead.</p>
 </div>
 
 
-                            </div>
-                            <div id="SequenceProducer.csv" class="classattr">
-                                        <input id="SequenceProducer.csv-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">csv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>:</span></span>
-
-                <label class="view-source-button" for="SequenceProducer.csv-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#SequenceProducer.csv"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SequenceProducer.csv-3107"><a href="#SequenceProducer.csv-3107"><span class="linenos">3107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-</span><span id="SequenceProducer.csv-3108"><a href="#SequenceProducer.csv-3108"><span class="linenos">3108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.csv-3109"><a href="#SequenceProducer.csv-3109"><span class="linenos">3109</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
-</span><span id="SequenceProducer.csv-3110"><a href="#SequenceProducer.csv-3110"><span class="linenos">3110</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.csv-3111"><a href="#SequenceProducer.csv-3111"><span class="linenos">3111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Reads and parses the input of a csv file.</p>
-</div>
-
-
-                            </div>
-                            <div id="SequenceProducer.read_csv" class="classattr">
-                                        <input id="SequenceProducer.read_csv-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">read_csv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>:</span></span>
-
-                <label class="view-source-button" for="SequenceProducer.read_csv-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#SequenceProducer.read_csv"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="SequenceProducer.read_csv-3113"><a href="#SequenceProducer.read_csv-3113"><span class="linenos">3113</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span>
-</span><span id="SequenceProducer.read_csv-3114"><a href="#SequenceProducer.read_csv-3114"><span class="linenos">3114</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="SequenceProducer.read_csv-3115"><a href="#SequenceProducer.read_csv-3115"><span class="linenos">3115</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-</span><span id="SequenceProducer.read_csv-3116"><a href="#SequenceProducer.read_csv-3116"><span class="linenos">3116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.read_csv-3117"><a href="#SequenceProducer.read_csv-3117"><span class="linenos">3117</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
-</span><span id="SequenceProducer.read_csv-3118"><a href="#SequenceProducer.read_csv-3118"><span class="linenos">3118</span></a>
-</span><span id="SequenceProducer.read_csv-3119"><a href="#SequenceProducer.read_csv-3119"><span class="linenos">3119</span></a><span class="sd">        Example 1:</span>
-</span><span id="SequenceProducer.read_csv-3120"><a href="#SequenceProducer.read_csv-3120"><span class="linenos">3120</span></a><span class="sd">        &gt;&gt;&gt; it.read_csv(&#39;tests/data/a.csv&#39;).to_list()</span>
-</span><span id="SequenceProducer.read_csv-3121"><a href="#SequenceProducer.read_csv-3121"><span class="linenos">3121</span></a><span class="sd">        [{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
-</span><span id="SequenceProducer.read_csv-3122"><a href="#SequenceProducer.read_csv-3122"><span class="linenos">3122</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="SequenceProducer.read_csv-3123"><a href="#SequenceProducer.read_csv-3123"><span class="linenos">3123</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
-</span><span id="SequenceProducer.read_csv-3124"><a href="#SequenceProducer.read_csv-3124"><span class="linenos">3124</span></a>
-</span><span id="SequenceProducer.read_csv-3125"><a href="#SequenceProducer.read_csv-3125"><span class="linenos">3125</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span>
-</span><span id="SequenceProducer.read_csv-3126"><a href="#SequenceProducer.read_csv-3126"><span class="linenos">3126</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="SequenceProducer.read_csv-3127"><a href="#SequenceProducer.read_csv-3127"><span class="linenos">3127</span></a>            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3128"><a href="#SequenceProducer.read_csv-3128"><span class="linenos">3128</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">it</span><span class="p">(</span><span class="o">*</span><span class="n">reader</span><span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3129"><a href="#SequenceProducer.read_csv-3129"><span class="linenos">3129</span></a>            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="SequenceProducer.read_csv-3130"><a href="#SequenceProducer.read_csv-3130"><span class="linenos">3130</span></a>                <span class="k">return</span> <span class="nb">iter</span>
-</span><span id="SequenceProducer.read_csv-3131"><a href="#SequenceProducer.read_csv-3131"><span class="linenos">3131</span></a>
-</span><span id="SequenceProducer.read_csv-3132"><a href="#SequenceProducer.read_csv-3132"><span class="linenos">3132</span></a>            <span class="n">headers</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">element_at_or_none</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3133"><a href="#SequenceProducer.read_csv-3133"><span class="linenos">3133</span></a>            <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="SequenceProducer.read_csv-3134"><a href="#SequenceProducer.read_csv-3134"><span class="linenos">3134</span></a>                <span class="k">if</span> <span class="n">header</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="SequenceProducer.read_csv-3135"><a href="#SequenceProducer.read_csv-3135"><span class="linenos">3135</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3136"><a href="#SequenceProducer.read_csv-3136"><span class="linenos">3136</span></a>                <span class="k">else</span><span class="p">:</span>
-</span><span id="SequenceProducer.read_csv-3137"><a href="#SequenceProducer.read_csv-3137"><span class="linenos">3137</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3138"><a href="#SequenceProducer.read_csv-3138"><span class="linenos">3138</span></a>
-</span><span id="SequenceProducer.read_csv-3139"><a href="#SequenceProducer.read_csv-3139"><span class="linenos">3139</span></a>                <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-</span><span id="SequenceProducer.read_csv-3140"><a href="#SequenceProducer.read_csv-3140"><span class="linenos">3140</span></a>                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">it</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">associate_by</span><span class="p">(</span>
-</span><span id="SequenceProducer.read_csv-3141"><a href="#SequenceProducer.read_csv-3141"><span class="linenos">3141</span></a>                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="SequenceProducer.read_csv-3142"><a href="#SequenceProducer.read_csv-3142"><span class="linenos">3142</span></a>                            <span class="n">headers</span><span class="p">[</span><span class="n">ordinal</span><span class="p">]</span> <span class="k">if</span> <span class="n">ordinal</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;undefined_</span><span class="si">{</span><span class="n">ordinal</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span id="SequenceProducer.read_csv-3143"><a href="#SequenceProducer.read_csv-3143"><span class="linenos">3143</span></a>                        <span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3144"><a href="#SequenceProducer.read_csv-3144"><span class="linenos">3144</span></a>                    <span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3145"><a href="#SequenceProducer.read_csv-3145"><span class="linenos">3145</span></a>                <span class="p">)</span>
-</span><span id="SequenceProducer.read_csv-3146"><a href="#SequenceProducer.read_csv-3146"><span class="linenos">3146</span></a>            <span class="k">return</span> <span class="nb">iter</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Reads and parses the input of a csv file.</p>
-
-<p>Example 1:</p>
-
-<div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;tests/data/a.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-<span class="go">[{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
-</code></pre>
-</div>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="Stream">
                             <input id="Stream-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -10275,6 +10149,205 @@ applied to elements of the given Stream.</p>
 
                             </div>
                 </section>
+                <section id="StreamProducer">
+                            <input id="StreamProducer-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">StreamProducer</span>:
+
+                <label class="view-source-button" for="StreamProducer-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#StreamProducer"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="StreamProducer-3081"><a href="#StreamProducer-3081"><span class="linenos">3081</span></a><span class="k">class</span><span class="w"> </span><span class="nc">StreamProducer</span><span class="p">:</span>
+</span><span id="StreamProducer-3082"><a href="#StreamProducer-3082"><span class="linenos">3082</span></a>    <span class="nd">@overload</span>
+</span><span id="StreamProducer-3083"><a href="#StreamProducer-3083"><span class="linenos">3083</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
+</span><span id="StreamProducer-3084"><a href="#StreamProducer-3084"><span class="linenos">3084</span></a>    <span class="nd">@overload</span>
+</span><span id="StreamProducer-3085"><a href="#StreamProducer-3085"><span class="linenos">3085</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
+</span><span id="StreamProducer-3086"><a href="#StreamProducer-3086"><span class="linenos">3086</span></a>    <span class="nd">@overload</span>
+</span><span id="StreamProducer-3087"><a href="#StreamProducer-3087"><span class="linenos">3087</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">elements</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span> <span class="o">...</span>
+</span><span id="StreamProducer-3088"><a href="#StreamProducer-3088"><span class="linenos">3088</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">T</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer-3089"><a href="#StreamProducer-3089"><span class="linenos">3089</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span><span id="StreamProducer-3090"><a href="#StreamProducer-3090"><span class="linenos">3090</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">iterable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="StreamProducer-3091"><a href="#StreamProducer-3091"><span class="linenos">3091</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Stream</span><span class="p">):</span>
+</span><span id="StreamProducer-3092"><a href="#StreamProducer-3092"><span class="linenos">3092</span></a>                <span class="k">return</span> <span class="nb">iter</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer-3093"><a href="#StreamProducer-3093"><span class="linenos">3093</span></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="StreamProducer-3094"><a href="#StreamProducer-3094"><span class="linenos">3094</span></a>                <span class="k">return</span> <span class="n">Stream</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer-3095"><a href="#StreamProducer-3095"><span class="linenos">3095</span></a>        <span class="k">return</span> <span class="n">Stream</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer-3096"><a href="#StreamProducer-3096"><span class="linenos">3096</span></a>
+</span><span id="StreamProducer-3097"><a href="#StreamProducer-3097"><span class="linenos">3097</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+</span><span id="StreamProducer-3098"><a href="#StreamProducer-3098"><span class="linenos">3098</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3099"><a href="#StreamProducer-3099"><span class="linenos">3099</span></a><span class="sd">        Reads and parses the input of a json file.</span>
+</span><span id="StreamProducer-3100"><a href="#StreamProducer-3100"><span class="linenos">3100</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3101"><a href="#StreamProducer-3101"><span class="linenos">3101</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="StreamProducer-3102"><a href="#StreamProducer-3102"><span class="linenos">3102</span></a>
+</span><span id="StreamProducer-3103"><a href="#StreamProducer-3103"><span class="linenos">3103</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="StreamProducer-3104"><a href="#StreamProducer-3104"><span class="linenos">3104</span></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer-3105"><a href="#StreamProducer-3105"><span class="linenos">3105</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span id="StreamProducer-3106"><a href="#StreamProducer-3106"><span class="linenos">3106</span></a>
+</span><span id="StreamProducer-3107"><a href="#StreamProducer-3107"><span class="linenos">3107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+</span><span id="StreamProducer-3108"><a href="#StreamProducer-3108"><span class="linenos">3108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3109"><a href="#StreamProducer-3109"><span class="linenos">3109</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
+</span><span id="StreamProducer-3110"><a href="#StreamProducer-3110"><span class="linenos">3110</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3111"><a href="#StreamProducer-3111"><span class="linenos">3111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span id="StreamProducer-3112"><a href="#StreamProducer-3112"><span class="linenos">3112</span></a>
+</span><span id="StreamProducer-3113"><a href="#StreamProducer-3113"><span class="linenos">3113</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span>
+</span><span id="StreamProducer-3114"><a href="#StreamProducer-3114"><span class="linenos">3114</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="StreamProducer-3115"><a href="#StreamProducer-3115"><span class="linenos">3115</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+</span><span id="StreamProducer-3116"><a href="#StreamProducer-3116"><span class="linenos">3116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3117"><a href="#StreamProducer-3117"><span class="linenos">3117</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
+</span><span id="StreamProducer-3118"><a href="#StreamProducer-3118"><span class="linenos">3118</span></a>
+</span><span id="StreamProducer-3119"><a href="#StreamProducer-3119"><span class="linenos">3119</span></a><span class="sd">        Example 1:</span>
+</span><span id="StreamProducer-3120"><a href="#StreamProducer-3120"><span class="linenos">3120</span></a><span class="sd">        &gt;&gt;&gt; it.read_csv(&#39;tests/data/a.csv&#39;).to_list()</span>
+</span><span id="StreamProducer-3121"><a href="#StreamProducer-3121"><span class="linenos">3121</span></a><span class="sd">        [{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
+</span><span id="StreamProducer-3122"><a href="#StreamProducer-3122"><span class="linenos">3122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer-3123"><a href="#StreamProducer-3123"><span class="linenos">3123</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+</span><span id="StreamProducer-3124"><a href="#StreamProducer-3124"><span class="linenos">3124</span></a>
+</span><span id="StreamProducer-3125"><a href="#StreamProducer-3125"><span class="linenos">3125</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span>
+</span><span id="StreamProducer-3126"><a href="#StreamProducer-3126"><span class="linenos">3126</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="StreamProducer-3127"><a href="#StreamProducer-3127"><span class="linenos">3127</span></a>            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="StreamProducer-3128"><a href="#StreamProducer-3128"><span class="linenos">3128</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">it</span><span class="p">(</span><span class="o">*</span><span class="n">reader</span><span class="p">)</span>
+</span><span id="StreamProducer-3129"><a href="#StreamProducer-3129"><span class="linenos">3129</span></a>            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="StreamProducer-3130"><a href="#StreamProducer-3130"><span class="linenos">3130</span></a>                <span class="k">return</span> <span class="nb">iter</span>
+</span><span id="StreamProducer-3131"><a href="#StreamProducer-3131"><span class="linenos">3131</span></a>
+</span><span id="StreamProducer-3132"><a href="#StreamProducer-3132"><span class="linenos">3132</span></a>            <span class="n">headers</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">element_at_or_none</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+</span><span id="StreamProducer-3133"><a href="#StreamProducer-3133"><span class="linenos">3133</span></a>            <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="StreamProducer-3134"><a href="#StreamProducer-3134"><span class="linenos">3134</span></a>                <span class="k">if</span> <span class="n">header</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="StreamProducer-3135"><a href="#StreamProducer-3135"><span class="linenos">3135</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="StreamProducer-3136"><a href="#StreamProducer-3136"><span class="linenos">3136</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="StreamProducer-3137"><a href="#StreamProducer-3137"><span class="linenos">3137</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">)</span>
+</span><span id="StreamProducer-3138"><a href="#StreamProducer-3138"><span class="linenos">3138</span></a>
+</span><span id="StreamProducer-3139"><a href="#StreamProducer-3139"><span class="linenos">3139</span></a>                <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+</span><span id="StreamProducer-3140"><a href="#StreamProducer-3140"><span class="linenos">3140</span></a>                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">it</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">associate_by</span><span class="p">(</span>
+</span><span id="StreamProducer-3141"><a href="#StreamProducer-3141"><span class="linenos">3141</span></a>                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="StreamProducer-3142"><a href="#StreamProducer-3142"><span class="linenos">3142</span></a>                            <span class="n">headers</span><span class="p">[</span><span class="n">ordinal</span><span class="p">]</span> <span class="k">if</span> <span class="n">ordinal</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;undefined_</span><span class="si">{</span><span class="n">ordinal</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="StreamProducer-3143"><a href="#StreamProducer-3143"><span class="linenos">3143</span></a>                        <span class="p">)</span>
+</span><span id="StreamProducer-3144"><a href="#StreamProducer-3144"><span class="linenos">3144</span></a>                    <span class="p">)</span>
+</span><span id="StreamProducer-3145"><a href="#StreamProducer-3145"><span class="linenos">3145</span></a>                <span class="p">)</span>
+</span><span id="StreamProducer-3146"><a href="#StreamProducer-3146"><span class="linenos">3146</span></a>            <span class="k">return</span> <span class="nb">iter</span>
+</span><span id="StreamProducer-3147"><a href="#StreamProducer-3147"><span class="linenos">3147</span></a>
+</span><span id="StreamProducer-3148"><a href="#StreamProducer-3148"><span class="linenos">3148</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="StreamProducer-3149"><a href="#StreamProducer-3149"><span class="linenos">3149</span></a>        <span class="k">return</span> <span class="n">__package__</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+</span></pre></div>
+
+
+    
+
+                            <div id="StreamProducer.json" class="classattr">
+                                        <input id="StreamProducer.json-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">json</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>:</span></span>
+
+                <label class="view-source-button" for="StreamProducer.json-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#StreamProducer.json"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="StreamProducer.json-3097"><a href="#StreamProducer.json-3097"><span class="linenos">3097</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+</span><span id="StreamProducer.json-3098"><a href="#StreamProducer.json-3098"><span class="linenos">3098</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer.json-3099"><a href="#StreamProducer.json-3099"><span class="linenos">3099</span></a><span class="sd">        Reads and parses the input of a json file.</span>
+</span><span id="StreamProducer.json-3100"><a href="#StreamProducer.json-3100"><span class="linenos">3100</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer.json-3101"><a href="#StreamProducer.json-3101"><span class="linenos">3101</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="StreamProducer.json-3102"><a href="#StreamProducer.json-3102"><span class="linenos">3102</span></a>
+</span><span id="StreamProducer.json-3103"><a href="#StreamProducer.json-3103"><span class="linenos">3103</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="StreamProducer.json-3104"><a href="#StreamProducer.json-3104"><span class="linenos">3104</span></a>            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="StreamProducer.json-3105"><a href="#StreamProducer.json-3105"><span class="linenos">3105</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Reads and parses the input of a json file.</p>
+</div>
+
+
+                            </div>
+                            <div id="StreamProducer.csv" class="classattr">
+                                        <input id="StreamProducer.csv-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">csv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>:</span></span>
+
+                <label class="view-source-button" for="StreamProducer.csv-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#StreamProducer.csv"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="StreamProducer.csv-3107"><a href="#StreamProducer.csv-3107"><span class="linenos">3107</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+</span><span id="StreamProducer.csv-3108"><a href="#StreamProducer.csv-3108"><span class="linenos">3108</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer.csv-3109"><a href="#StreamProducer.csv-3109"><span class="linenos">3109</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
+</span><span id="StreamProducer.csv-3110"><a href="#StreamProducer.csv-3110"><span class="linenos">3110</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer.csv-3111"><a href="#StreamProducer.csv-3111"><span class="linenos">3111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Reads and parses the input of a csv file.</p>
+</div>
+
+
+                            </div>
+                            <div id="StreamProducer.read_csv" class="classattr">
+                                        <input id="StreamProducer.read_csv-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">read_csv</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></span><span class="return-annotation">) -> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n"><a href="#Stream">Stream</a></span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span>:</span></span>
+
+                <label class="view-source-button" for="StreamProducer.read_csv-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#StreamProducer.read_csv"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="StreamProducer.read_csv-3113"><a href="#StreamProducer.read_csv-3113"><span class="linenos">3113</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span>
+</span><span id="StreamProducer.read_csv-3114"><a href="#StreamProducer.read_csv-3114"><span class="linenos">3114</span></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="StreamProducer.read_csv-3115"><a href="#StreamProducer.read_csv-3115"><span class="linenos">3115</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stream</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="n">Stream</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+</span><span id="StreamProducer.read_csv-3116"><a href="#StreamProducer.read_csv-3116"><span class="linenos">3116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="StreamProducer.read_csv-3117"><a href="#StreamProducer.read_csv-3117"><span class="linenos">3117</span></a><span class="sd">        Reads and parses the input of a csv file.</span>
+</span><span id="StreamProducer.read_csv-3118"><a href="#StreamProducer.read_csv-3118"><span class="linenos">3118</span></a>
+</span><span id="StreamProducer.read_csv-3119"><a href="#StreamProducer.read_csv-3119"><span class="linenos">3119</span></a><span class="sd">        Example 1:</span>
+</span><span id="StreamProducer.read_csv-3120"><a href="#StreamProducer.read_csv-3120"><span class="linenos">3120</span></a><span class="sd">        &gt;&gt;&gt; it.read_csv(&#39;tests/data/a.csv&#39;).to_list()</span>
+</span><span id="StreamProducer.read_csv-3121"><a href="#StreamProducer.read_csv-3121"><span class="linenos">3121</span></a><span class="sd">        [{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
+</span><span id="StreamProducer.read_csv-3122"><a href="#StreamProducer.read_csv-3122"><span class="linenos">3122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="StreamProducer.read_csv-3123"><a href="#StreamProducer.read_csv-3123"><span class="linenos">3123</span></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+</span><span id="StreamProducer.read_csv-3124"><a href="#StreamProducer.read_csv-3124"><span class="linenos">3124</span></a>
+</span><span id="StreamProducer.read_csv-3125"><a href="#StreamProducer.read_csv-3125"><span class="linenos">3125</span></a>        <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span>
+</span><span id="StreamProducer.read_csv-3126"><a href="#StreamProducer.read_csv-3126"><span class="linenos">3126</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="StreamProducer.read_csv-3127"><a href="#StreamProducer.read_csv-3127"><span class="linenos">3127</span></a>            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3128"><a href="#StreamProducer.read_csv-3128"><span class="linenos">3128</span></a>            <span class="nb">iter</span> <span class="o">=</span> <span class="n">it</span><span class="p">(</span><span class="o">*</span><span class="n">reader</span><span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3129"><a href="#StreamProducer.read_csv-3129"><span class="linenos">3129</span></a>            <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="StreamProducer.read_csv-3130"><a href="#StreamProducer.read_csv-3130"><span class="linenos">3130</span></a>                <span class="k">return</span> <span class="nb">iter</span>
+</span><span id="StreamProducer.read_csv-3131"><a href="#StreamProducer.read_csv-3131"><span class="linenos">3131</span></a>
+</span><span id="StreamProducer.read_csv-3132"><a href="#StreamProducer.read_csv-3132"><span class="linenos">3132</span></a>            <span class="n">headers</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">element_at_or_none</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3133"><a href="#StreamProducer.read_csv-3133"><span class="linenos">3133</span></a>            <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="StreamProducer.read_csv-3134"><a href="#StreamProducer.read_csv-3134"><span class="linenos">3134</span></a>                <span class="k">if</span> <span class="n">header</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="StreamProducer.read_csv-3135"><a href="#StreamProducer.read_csv-3135"><span class="linenos">3135</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3136"><a href="#StreamProducer.read_csv-3136"><span class="linenos">3136</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="StreamProducer.read_csv-3137"><a href="#StreamProducer.read_csv-3137"><span class="linenos">3137</span></a>                    <span class="nb">iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">header</span><span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3138"><a href="#StreamProducer.read_csv-3138"><span class="linenos">3138</span></a>
+</span><span id="StreamProducer.read_csv-3139"><a href="#StreamProducer.read_csv-3139"><span class="linenos">3139</span></a>                <span class="k">return</span> <span class="nb">iter</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+</span><span id="StreamProducer.read_csv-3140"><a href="#StreamProducer.read_csv-3140"><span class="linenos">3140</span></a>                    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">it</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">associate_by</span><span class="p">(</span>
+</span><span id="StreamProducer.read_csv-3141"><a href="#StreamProducer.read_csv-3141"><span class="linenos">3141</span></a>                        <span class="k">lambda</span> <span class="n">_</span><span class="p">,</span> <span class="n">ordinal</span><span class="p">:</span> <span class="p">(</span>
+</span><span id="StreamProducer.read_csv-3142"><a href="#StreamProducer.read_csv-3142"><span class="linenos">3142</span></a>                            <span class="n">headers</span><span class="p">[</span><span class="n">ordinal</span><span class="p">]</span> <span class="k">if</span> <span class="n">ordinal</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;undefined_</span><span class="si">{</span><span class="n">ordinal</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="StreamProducer.read_csv-3143"><a href="#StreamProducer.read_csv-3143"><span class="linenos">3143</span></a>                        <span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3144"><a href="#StreamProducer.read_csv-3144"><span class="linenos">3144</span></a>                    <span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3145"><a href="#StreamProducer.read_csv-3145"><span class="linenos">3145</span></a>                <span class="p">)</span>
+</span><span id="StreamProducer.read_csv-3146"><a href="#StreamProducer.read_csv-3146"><span class="linenos">3146</span></a>            <span class="k">return</span> <span class="nb">iter</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Reads and parses the input of a csv file.</p>
+
+<p>Example 1:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">it</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;tests/data/a.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[{&#39;a&#39;: &#39;a1&#39;, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: &#39;a2&#39;, &#39;b&#39;: &#39;2&#39;}]</span>
+</code></pre>
+</div>
+</div>
+
+
+                            </div>
+                </section>
                 <section id="is_debugging">
                             <input id="is_debugging-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -10359,26 +10432,84 @@ applied to elements of the given Stream.</p>
                 </section>
                 <section id="seq">
                     <div class="attr variable">
-            <span class="name">seq</span>        =
+            <span class="name">seq</span><span class="annotation">: <a href="#StreamProducer">StreamProducer</a></span>        =
 <span class="default_value">pyiter</span>
 
         
     </div>
     <a class="headerlink" href="#seq"></a>
     
-    
+            <div class="docstring"><p>Deprecated. Use <code><a href="#it">pyiter.it</a></code> instead.</p>
+
+<pre><code>Example 1:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</code></pre>
+</div>
+
+<pre><code>Example 2:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">([</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</code></pre>
+</div>
+
+<pre><code>Example 3:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">seq</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+</code></pre>
+</div>
+</div>
+
 
                 </section>
                 <section id="sequence">
                     <div class="attr variable">
-            <span class="name">sequence</span>        =
+            <span class="name">sequence</span><span class="annotation">: <a href="#StreamProducer">StreamProducer</a></span>        =
 <span class="default_value">pyiter</span>
 
         
     </div>
     <a class="headerlink" href="#sequence"></a>
     
-    
+            <div class="docstring"><p>Deprecated. Use <code><a href="#it">pyiter.it</a></code> instead.</p>
+
+<pre><code>Example 1:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">sequence</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</code></pre>
+</div>
+
+<pre><code>Example 2:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">sequence</span><span class="p">([</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[&#39;HELLO&#39;, &#39;WORLD&#39;]</span>
+</code></pre>
+</div>
+
+<pre><code>Example 3:
+</code></pre>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">sequence</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="go">[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+</code></pre>
+</div>
+</div>
+
 
                 </section>
                 <section id="throw">
